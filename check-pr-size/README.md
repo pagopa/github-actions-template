@@ -9,6 +9,7 @@ This action check the size of a PR.
 - name: Check PR Size
   uses: pagopa/github-actions-template/check-pr-size@main
   with:
+    github_token: ${{ secrets.GITHUB_TOKEN }}
     ignored_files: 'openapi.json, .github/'
     max_size: 700
       
@@ -18,6 +19,7 @@ This action check the size of a PR.
 
 | Param         | Description                  | Required | Values                                                 | Default |
 |---------------|------------------------------|----------|--------------------------------------------------------|---------|
+| github_token  | A GitHub token               | **true** | `string`                                               |         |
 | ignored_files | File to ignore               | false    | `string`: directory, or file to ignore (**csv style**) |         |
 | min_size      | Minimum size of pull request | false    | `number`                                               | 200     |
 | max_size      | Maximum size of pull request | false    | `number`                                               | 400     |

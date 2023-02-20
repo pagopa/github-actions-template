@@ -18,15 +18,17 @@ Remember to add the package write permissions to the action https://github.com/u
   with:
     branch: 'main'
     tag: '1.0.0'
+    github_token: ${{ secrets.GITHUB_TOKEN }}
       
 ```
 
 ## Input
 
-| Param  | Description           | Required | Values   | Default |
-|--------|-----------------------|----------|----------|---------|
-| branch | Branch where chekcout | **true** | `string` |         |
-| tag    | A tag for the image   | **true** | `string` |         |
+| Param        | Description           | Required | Values   | Default |
+|--------------|-----------------------|----------|----------|---------|
+| branch       | Branch where chekcout | **true** | `string` |         |
+| tag          | A tag for the image   | **true** | `string` |         |
+| github_token | A GitHub token        | **true** | `string` |         |
 
 ## Output
 

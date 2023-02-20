@@ -17,6 +17,10 @@ inputs:
     type: number
     default: 400
     description: Maximum number of changes
+  github_token:
+    required: true
+    type: string
+    description: Github Token
 
 runs:
   using: "composite"
@@ -28,7 +32,7 @@ runs:
         MIN: ${{inputs.min_size}}
         MAX: ${{inputs.max_size}}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github_token }}
         script: |
           const additions = context.payload.pull_request.additions || 0
           const deletions = context.payload.pull_request.deletions || 0
