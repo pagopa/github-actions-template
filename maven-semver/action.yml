@@ -44,22 +44,22 @@ runs:
     - name: Set build-number
       run: |
         mvn build-helper:parse-version versions:set -DnewVersion='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-${parsedVersion.nextBuildNumber}${{env.BRANCH}}'
-      if: ${{ needs.setup.outputs.semver == 'buildNumber' }}
+      if: ${{ inputs.semver == 'buildNumber' }}
 
     - name: Set major
       run: |
         mvn build-helper:parse-version versions:set -DnewVersion='${parsedVersion.nextMajorVersion}.0.0${{env.BRANCH}}'
-      if: ${{ needs.setup.outputs.semver == 'major' }}
+      if: ${{ inputs.semver == 'major' }}
 
     - name: Set minor
       run: |
         mvn build-helper:parse-version versions:set -DnewVersion='${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0${{env.BRANCH}}'
-      if: ${{ needs.setup.outputs.semver == 'minor' }}
+      if: ${{ inputs.semver == 'minor' }}
 
     - name: Set patch
       run: |
         mvn build-helper:parse-version versions:set -DnewVersion='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}${{env.BRANCH}}'
-      if: ${{ needs.setup.outputs.semver == 'patch' }}
+      if: ${{ inputs.semver == 'patch' }}
 
     - id: get_version
       name: Get Version
@@ -68,7 +68,7 @@ runs:
         echo "version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
     - name: Update Version Helm
-      if: ${{ needs.setup.outputs.semver != 'skip' }}
+      if: ${{ inputs.semver != 'skip' }}
       run: |
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
@@ -82,7 +82,7 @@ runs:
           git add "$CHART_FILE"
         fi
     - name: Update Openapi/Swagger Version
-      if: ${{ needs.setup.outputs.semver != 'skip' }}
+      if: ${{ inputs.semver != 'skip' }}
       run: |
         for i in openapi/*.json; do
           [ -f "$i" ] || break
