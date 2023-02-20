@@ -37,7 +37,7 @@ runs:
         images: ghcr.io/${{ github.repository }}
         tags: |
           latest
-          ${{ needs.release.outputs.version }}
+          ${{ inputs.tag }}
           type=ref,event=branch
           type=sha
 
