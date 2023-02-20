@@ -23,10 +23,10 @@ Remember to add the package write permissions to the action https://github.com/u
 
 ## Input
 
-| Param  | Description           | Required | Values | Default |
-|--------|-----------------------|----------|--------|---------|
-| branch | Branch where chekcout | **true** |        |         |
-| tag    | A tag for the image   | **true** |        |         |
+| Param  | Description           | Required | Values   | Default |
+|--------|-----------------------|----------|----------|---------|
+| branch | Branch where chekcout | **true** | `string` |         |
+| tag    | A tag for the image   | **true** | `string` |         |
 
 ## Output
 
