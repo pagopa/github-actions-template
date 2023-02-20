@@ -1,0 +1,91 @@
+name: Maven Code Review
+description: "Code Review for Pull Request"
+
+inputs:
+  github_token:
+    required: true
+    type: string
+    description: Github Token
+  sonar_token:
+    required: true
+    type: string
+    description: Sonar Token for the login
+  project_key:
+    required: true
+    type: string
+    description: Key of the project on SonarCloud
+  coverage_exclusions:
+    required: false
+    type: string
+    description: Files to exclude from coverage
+    default: '**/config/*,**/*Mock*,**/model/**,**/entity/*'
+  cpd_exclusions:
+    required: false
+    type: string
+    description: Files to exclude from code duplication
+    default: '**/model/**,**/entity/*'
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v2
+
+  - name: Set up JDK 11
+    uses: actions/setup-java@v1
+    with:
+      java-version: 11
+
+  - name: Set up Maven
+    uses: stCarolas/setup-maven@v4.5
+    with:
+      maven-version: 3.8.2
+
+  - name: Cache Maven packages
+    uses: actions/cache@v1
+    with:
+      path: ~/.m2
+      key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+      restore-keys: ${{ runner.os }}-m2
+
+  - name: Cache SonarCloud packages
+    uses: actions/cache@v1
+    with:
+      path: ~/.sonar-project.properties/cache
+      key: ${{ runner.os }}-sonar-project.properties
+      restore-keys: ${{ runner.os }}-sonar-project.properties
+
+  - name: Build and analyze on Pull Requests
+    if: ${{ github.event_name == 'pull_request' }}
+    shell: bash
+    run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      -Dsonar.organization=pagopa
+      -Dsonar.projectKey=${{ env.PROJECT_KEY }}
+      -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+      -Dsonar.coverage.exclusions=${{inputs.coverage_exclusions}}
+      -Dsonar.cpd.exclusions=${{inputs.cpd_exclusions}}
+      -Dsonar.host.url=https://sonarcloud.io
+      -Dsonar.login=${{ inputs.sonar_token }}
+      -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+      -Dsonar.pullrequest.branch=${{ github.head_ref }}
+      -Dsonar.pullrequest.base=${{ github.base_ref }}
+    env:
+      # Needed to get some information about the pull request, if any
+      GITHUB_TOKEN: ${{ inputs.github_token }}
+      # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
+      SONAR_TOKEN: ${{ inputs.sonar_token }}
+
+  - name: Build and analyze on Push main
+    if: ${{ github.event_name != 'pull_request' }}
+    shell: bash
+    env:
+      GITHUB_TOKEN: ${{ inputs.github_token }}
+      SONAR_TOKEN: ${{ inputs.sonar_token }}
+    run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      -Dsonar.organization=pagopa
+      -Dsonar.projectKey=${{ env.PROJECT_KEY }}
+      -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+      -Dsonar.coverage.exclusions=${{inputs.coverage_exclusions}}
+      -Dsonar.cpd.exclusions=${{inputs.cpd_exclusions}}
+      -Dsonar.branch.name=${{ github.head_ref }}
+      -Dsonar.host.url=https://sonarcloud.io
+      -Dsonar.login=${{ inputs.sonar_token }}

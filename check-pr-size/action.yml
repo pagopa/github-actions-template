@@ -25,6 +25,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
     - name: Check Size
       uses: actions/github-script@v6.3.3
       env:
