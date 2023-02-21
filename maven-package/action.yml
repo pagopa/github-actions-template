@@ -1,0 +1,49 @@
+name: Make Package
+description: "Make a new package on GitHub"
+
+inputs:
+  github_token:
+    required: true
+    type: string
+    description: Github Token with Admin privileges
+
+
+outputs:
+  version:
+    description: "New Version"
+    value: ${{ steps.semver.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        cache: maven
+
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@v4.5
+      with:
+        maven-version: 3.8.2
+
+    - name: Cache Maven packages
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+      shell: bash
+
+    - name: Deploy to GitHub Package Registry
+      run: |
+        echo "<settings><servers><server><id>github</id><password>${{input.github_token}}</password></server></servers></settings>" > ~/.m2/settings.xml
+        REPO="gh::default::https://maven.pkg.github.com/${{github.repository}}"
+        mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}"
+      shell: bash
