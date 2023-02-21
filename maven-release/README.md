@@ -15,7 +15,7 @@ The new version is saved in the output.
 ``` yaml
 - name: Make Release
   id: release
-  uses: pagopa/github-actions-template/release@v1
+  uses: pagopa/github-actions-template/maven-release@v1
   with:
     semver: 'major'
       
