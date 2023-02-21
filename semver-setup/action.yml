@@ -1,0 +1,42 @@
+name: Semver Setup
+description: "Setting up semver according to issue label"
+
+outputs:
+  semver:
+    description: "Semver Version"
+    value: ${{ steps.output.outputs.semver }}
+
+runs:
+  using: "composite"
+  steps:
+    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'major')) || github.event.inputs.semver == 'major' }}
+      run: echo "SEMVER=major" >> $GITHUB_ENV
+      shell: bash
+
+    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'minor')) || github.event.inputs.semver == 'minor' }}
+      run: echo "SEMVER=minor" >> $GITHUB_ENV
+      shell: bash
+
+    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'patch')) || github.event.inputs.semver == 'patch' }}
+      run: echo "SEMVER=patch" >> $GITHUB_ENV
+      shell: bash
+
+    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'skip')) || github.event.inputs.semver == 'skip' }}
+      run: echo "SEMVER=skip" >> $GITHUB_ENV
+      shell: bash
+
+    - if: ${{ github.event.inputs.semver == 'buildNumber' }}
+      run: echo "SEMVER=buildNumber" >> $GITHUB_ENV
+      shell: bash
+
+    - if: ${{ env.SEMVER == null }}
+      run: echo "Semver not set"; exit 1
+      shell: bash
+
+    - id: output
+      name: Set Output
+      run: |
+        echo "semver=${{env.SEMVER}}" >> $GITHUB_OUTPUT
+      shell: bash
+
+
