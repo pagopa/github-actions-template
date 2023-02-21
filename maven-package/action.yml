@@ -50,8 +50,8 @@ runs:
 
     - uses: whelk-io/maven-settings-xml-action@v4
       with:
-        repositories: [{ "id": "github", "url": "https://maven.pkg.github.com/${{github.repository}}" }]
-        servers: [{ "id": "github", "username": "${{inputs.username}}", "password": "${{ inputs.github_token }}" }]
+        repositories: '[{ "id": "github", "url": "https://maven.pkg.github.com/${{github.repository}}" }]'
+        servers: '[{ "id": "github", "username": "${{inputs.username}}", "password": "${{ inputs.github_token }}" }]'
 
 
     - name: Deploy to GitHub Package Registry
