@@ -1,18 +1,6 @@
 name: Semver Setup
 description: "Setting up semver according to issue label"
 
-inputs:
-  semver:
-    required: true
-    type: choice
-    description: Select the new Semantic Version
-    options:
-      - major
-      - minor
-      - patch
-      - buildNumber
-      - skip
-
 outputs:
   version:
     description: "Semver Version"
