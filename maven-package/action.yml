@@ -2,10 +2,14 @@ name: Make Package
 description: "Make a new package on GitHub"
 
 inputs:
+  username:
+    required: true
+    type: string
+    description: Github Username
   github_token:
     required: true
     type: string
-    description: Github Token with Admin privileges
+    description: Github Token
   branch:
     required: true
     type: string
@@ -44,14 +48,16 @@ runs:
       run: mvn -B package --file pom.xml
       shell: bash
 
-#    - name: Deploy to GitHub Package Registry
-#      run: |
-#        echo "<settings><servers><server><id>github</id><password>${{input.github_token}}</password></server></servers></settings>" > ~/.m2/settings.xml
-#        REPO="gh::default::https://maven.pkg.github.com/${{github.repository}}"
-#        mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}"
-#      shell: bash
+    - uses: whelk-io/maven-settings-xml-action@v4
+      with:
+        repositories: [{ "id": "github", "url": "https://maven.pkg.github.com/${{github.repository}}" }]
+        servers: [{ "id": "github", "username": "${{inputs.username}}", "password": "${{ inputs.github_token }}" }]
+
 
     - name: Deploy to GitHub Package Registry
       run: |
-        mvn deploy -Dtoken=${{ inputs.github_token }}
+        REPO="github::default::https://maven.pkg.github.com/${{github.repository}}"
+        mvn -B deploy -DaltReleaseDeploymentRepository="${REPO}"
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
