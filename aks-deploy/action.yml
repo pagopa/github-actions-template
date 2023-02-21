@@ -1,0 +1,95 @@
+name: Check PR Size
+description: "Check the size of a Pull Request"
+
+inputs:
+  client_id:
+    required: true
+    description: Azure Client ID
+    type: string
+  subscription_id:
+    required: true
+    description: Azure Subscription ID
+    type: string
+  tenant_id:
+    required: true
+    description: Azure Tenant ID
+    type: string
+  env:
+    required: true
+    description: The name of the environment where to deploy
+    type: choice
+    options:
+      - dev
+      - uat
+      - prod
+  namespace:
+    required: true
+    description: The namespace on AKS
+    type: string
+  cluster_name:
+    required: true
+    description: The name of the cluster
+    type: string
+  resource_group:
+    required: true
+    description: The resource group of the cluster
+    type: string
+  version:
+    required: true
+    description: The Image version to deploy
+    type: string
+  app_name:
+    required: true
+    description: The name of the application
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name}}
+
+    - name: Read terraform version
+      shell: bash
+      run: |
+        echo "TERRAFORM_VERSION=`cat .terraform-version`" >> $GITHUB_ENV
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@8feba2b913ea459066180f9cb177f58a881cf146
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+    - name: Set up kubelogin for non-interactive login
+      uses: azure/use-kubelogin@v1
+      with:
+        kubelogin-version: 'v0.0.24'
+
+    - name: Login
+      uses: azure/login@89d153571fe9a34ed70fcf9f1d95ab8debea7a73
+      with:
+        client-id: ${{ inputs.CLIENT_ID }}
+        tenant-id: ${{ inputs.TENANT_ID }}
+        subscription-id: ${{ inputs.SUBSCRIPTION_ID }}
+
+    - name: Gets K8s context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{inputs.resource_group}}
+        cluster-name: ${{inputs.cluster_name}}
+        admin: 'false'
+        use-kubelogin: 'true'
+
+    - name: Helm Setup
+      shell: bash
+      run: |
+        helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
+        helm dep build helm
+
+    - name: Helm Deploy
+      shell: bash
+      run: helm upgrade --namespace ${{ inputs.namespace }}
+        --install --values ./helm/values-${{ inputs.env }}.yaml
+        --set microservice-chart.image.tag=${{ inputs.version }}
+        --wait --timeout 5m0s
+        ${{ inputs.app_name }} ./helm
