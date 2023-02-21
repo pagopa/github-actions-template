@@ -2,10 +2,6 @@ name: Make Package
 description: "Make a new package on GitHub"
 
 inputs:
-  username:
-    required: true
-    type: string
-    description: Github Username
   github_token:
     required: true
     type: string
@@ -47,12 +43,6 @@ runs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
       shell: bash
-
-#    - uses: whelk-io/maven-settings-xml-action@v4
-#      with:
-#        repositories: '[{ "id": "github", "url": "https://maven.pkg.github.com/${{github.repository}}" }]'
-#        servers: '[{ "id": "github", "username": "${{inputs.username}}", "password": "${{ inputs.github_token }}" }]'
-
 
     - name: Deploy to GitHub Package Registry
       run: |
