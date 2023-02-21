@@ -7,7 +7,7 @@ The action:
 
 👀 **Important!**
 
-Remember to add the package write permissions to the action https://github.com/users/<OWNER>/packages/container/<REPOSITORY>/settings
+Remember to add the package write permissions to the action https://github.com/users/OWNER/packages/container/REPOSITORY/settings
 
 
 ## Usage
