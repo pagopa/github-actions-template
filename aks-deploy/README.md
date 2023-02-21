@@ -16,9 +16,6 @@ This action makes a deployment on AKS of a docker image.
     resource_group: 'your-resource-group'
     version: '1.0.0'
     app_name: 'myapp'
-   
-
-      
 ```
 
 ## Input
