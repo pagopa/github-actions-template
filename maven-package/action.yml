@@ -55,5 +55,5 @@ runs:
       run: |
 #        echo "<settings><servers><server><id>github</id><password>${{input.github_token}}</password></server></servers></settings>" > ~/.m2/settings.xml
 #        REPO="gh::default::https://maven.pkg.github.com/${{github.repository}}"
-        mvn deploy -Dtoken=${{ input.github_token }}
+        mvn deploy -Dtoken=${{ inputs.github_token }}
       shell: bash
