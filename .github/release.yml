@@ -1,0 +1,21 @@
+# release.yml
+
+changelog:
+  exclude:
+    labels:
+      - skip
+    authors:
+      - pagopa-github-bot
+  categories:
+    - title: Breaking Changes 🛠
+      labels:
+        - major
+    - title: Exciting New Features 🎉
+      labels:
+        - minor
+    - title: Bugfix 🩺
+      labels:
+        - patch
+    - title: Other Changes
+      labels:
+        - "*"
