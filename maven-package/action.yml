@@ -44,9 +44,14 @@ runs:
       run: mvn -B package --file pom.xml
       shell: bash
 
+#    - name: Deploy to GitHub Package Registry
+#      run: |
+#        echo "<settings><servers><server><id>github</id><password>${{input.github_token}}</password></server></servers></settings>" > ~/.m2/settings.xml
+#        REPO="gh::default::https://maven.pkg.github.com/${{github.repository}}"
+#        mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}"
+#      shell: bash
+
     - name: Deploy to GitHub Package Registry
       run: |
-        echo "<settings><servers><server><id>github</id><password>${{input.github_token}}</password></server></servers></settings>" > ~/.m2/settings.xml
-        REPO="gh::default::https://maven.pkg.github.com/${{github.repository}}"
-        mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}"
+        mvn deploy
       shell: bash
