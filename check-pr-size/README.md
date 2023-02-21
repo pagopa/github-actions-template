@@ -7,7 +7,7 @@ This action check the size of a PR.
 
 ``` yaml
 - name: Check PR Size
-  uses: pagopa/github-actions-template/check-pr-size@main
+  uses: pagopa/github-actions-template/check-pr-size@v1
   with:
     github_token: ${{ secrets.GITHUB_TOKEN }}
     ignored_files: 'openapi.json, .github/'

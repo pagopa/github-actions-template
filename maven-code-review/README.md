@@ -9,7 +9,7 @@ Remember to add [jacoco plugin](https://github.com/pagopa/template-java-spring-m
 
 ``` yaml
 - name: Code Review
-  uses: pagopa/github-actions-template/maven-code-review@main
+  uses: pagopa/github-actions-template/maven-code-review@v1
   with:
     github_token: ${{ secrets.GITHUB_TOKEN }}
     sonar_token: ${{ secrets.SONAR_TOKEN }}

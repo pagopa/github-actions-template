@@ -15,7 +15,7 @@ The new version is saved in the output.
 ``` yaml
 - name: Update Semantic Version
   id: semver
-  uses: pagopa/github-actions-template/maven-semver@main
+  uses: pagopa/github-actions-template/maven-semver@v1
   with:
     semver: 'major'
       

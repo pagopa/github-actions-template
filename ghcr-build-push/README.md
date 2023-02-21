@@ -14,7 +14,7 @@ Remember to add the package write permissions to the action https://github.com/u
 
 ``` yaml
 - name: Buil and Push
-  uses: pagopa/github-actions-template/ghcr-build-push@main
+  uses: pagopa/github-actions-template/ghcr-build-push@v1
   with:
     branch: 'main'
     tag: '1.0.0'
