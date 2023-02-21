@@ -9,19 +9,19 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'major')) || github.event.inputs.semver == 'major' }}
+    - if: ${{ (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'major')) || github.event.inputs.semver == 'major' }}
       run: echo "SEMVER=major" >> $GITHUB_ENV
       shell: bash
 
-    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'minor')) || github.event.inputs.semver == 'minor' }}
+    - if: ${{ (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'minor')) || github.event.inputs.semver == 'minor' }}
       run: echo "SEMVER=minor" >> $GITHUB_ENV
       shell: bash
 
-    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'patch')) || github.event.inputs.semver == 'patch' }}
+    - if: ${{ (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'patch')) || github.event.inputs.semver == 'patch' }}
       run: echo "SEMVER=patch" >> $GITHUB_ENV
       shell: bash
 
-    - if: ${{ (github.event.pull_request.merged == 'true' && contains(github.event.pull_request.labels.*.name, 'skip')) || github.event.inputs.semver == 'skip' }}
+    - if: ${{ (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'skip')) || github.event.inputs.semver == 'skip' }}
       run: echo "SEMVER=skip" >> $GITHUB_ENV
       shell: bash
 
