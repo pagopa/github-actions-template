@@ -2,7 +2,7 @@ name: Semver Setup
 description: "Setting up semver according to issue label"
 
 outputs:
-  version:
+  semver:
     description: "Semver Version"
     value: ${{ steps.output.outputs.semver }}
 
