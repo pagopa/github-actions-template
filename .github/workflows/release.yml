@@ -10,16 +10,17 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    semver:
-      required: true
-      type: choice
-      description: Select the new Semantic Version
-      options:
-        - major
-        - minor
-        - patch
-        - buildNumber
-        - skip
+    inputs:
+      semver:
+        required: true
+        type: choice
+        description: Select the new Semantic Version
+        options:
+          - major
+          - minor
+          - patch
+          - buildNumber
+          - skip
 
 
 permissions:
