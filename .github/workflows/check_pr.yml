@@ -1,0 +1,125 @@
+name: Check PR
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - main
+    types: [ opened, synchronize, labeled, unlabeled, reopened, edited ]
+
+
+permissions:
+  pull-requests: write
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  auto_assign:
+    name: Auto Assign
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Assign Me
+        # You may pin to the exact commit or the version.
+        uses: kentaro-m/auto-assign-action@v1.2.1
+        with:
+          configuration-path: '.github/auto_assign.yml'
+
+  check_labels:
+    name: Check Required Labels
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Verify PR Labels
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'breaking-change') && !contains(github.event.pull_request.labels.*.name, 'enhancement') && !contains(github.event.pull_request.labels.*.name, 'bug') && !contains(github.event.pull_request.labels.*.name, 'ignore-for-release') }}
+        uses: actions/github-script@v6.3.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var comments = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo
+            });
+            for (const comment of comments.data) {
+              if (comment.body.includes('This pull request does not contain a valid label')){
+                github.rest.issues.deleteComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id
+                })
+              }
+            }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'This pull request does not contain a valid label. Please add one of the following labels: `[bug, enhancement, breaking-change, ignore-for-release]`'
+            })
+            core.setFailed('Missing required labels')
+
+
+  check_format:
+    name: Check Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Formatting
+        id: format
+        continue-on-error: true
+        uses: axel-op/googlejavaformat-action@v3
+        with:
+          args: "--set-exit-if-changed"
+
+      - uses: actions/github-script@v6.3.3
+        if: steps.format.outcome != 'success'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            console.log(context);
+            var comments = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo
+            });
+            for (const comment of comments.data) {
+              console.log(comment);
+              if (comment.body.includes('Comment this PR with')){
+                github.rest.issues.deleteComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id
+                })
+              }
+            }
+            github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: 'Comment this PR with *update_code* to format the code. Consider to use pre-commit to format the code.'
+            })
+            core.setFailed('Format your code.')
+
+  check_size:
+    runs-on: ubuntu-latest
+    name: Check Size
+    steps:
+
+      - name: Dump GitHub context
+        run: echo $JSON
+        env:
+          JSON: ${{ toJSON(github) }}
+
+      - name: Check PR Size
+        uses: pagopa/github-actions-template/check-pr-size@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ignored_files: 'openapi.json, openapi-node.json'
