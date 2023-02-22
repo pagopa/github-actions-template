@@ -68,6 +68,7 @@ runs:
           }
 
           let { MIN } = process.env
+          MIN = MIN ?? 200;
           console.log('min = ' + MIN);
           if (changes < MIN){
             github.rest.issues.addLabels({
@@ -94,6 +95,7 @@ runs:
           }
 
           let { MAX } = process.env
+          MAX = MAX ?? 400;                  
           console.log('max = ' + MAX);
           if (changes > MAX){
 #            github.rest.issues.addLabels({
