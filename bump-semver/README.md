@@ -1,6 +1,6 @@
 # Bump Semver
 
-This action calculate the new semantic version according the inputs.
+This action calculate the new [semantic version](https://semver.org/) according to the inputs.
 
 The new version is saved in the output.
 
