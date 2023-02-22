@@ -20,7 +20,6 @@ on:
           - minor
           - patch
           - buildNumber
-          - skip
 
 
 permissions:
@@ -53,10 +52,10 @@ jobs:
 
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          allowUpdates: true
-          draft: false
-          makeLatest: true
-          name: ${{ steps.bump_version.outputs.new_version }}
-          body: Changelog Contents
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.bump_version.outputs.new_version }}
+          name: Release ${{ steps.bump_version.outputs.new_version }}
+          makeLatest: latest
+          generateReleaseNotes: true
