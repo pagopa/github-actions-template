@@ -119,6 +119,6 @@ jobs:
           JSON: ${{ toJSON(github) }}
 
       - name: Check PR Size
-        uses: pagopa/github-actions-template/check-pr-size@main
+        uses: pagopa/github-actions-template/check-pr-size@actions
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
