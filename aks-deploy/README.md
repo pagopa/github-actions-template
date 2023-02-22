@@ -1,4 +1,5 @@
 # AKS Deploy
+
 This action makes a deployment on AKS of a docker image.
 
 ## Usage
@@ -33,6 +34,7 @@ This action makes a deployment on AKS of a docker image.
 | app_name        | The name of the application       | **true** | `string`             |         |
 
 ## Output
+
 | Value   | Description |
 |---------|-------------|
 | version | New Version |

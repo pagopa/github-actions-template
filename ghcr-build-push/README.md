@@ -1,14 +1,16 @@
 # GHCR Build Push
+
 This action build and push the docker image on GitHub Container Registry.
 
 The action:
+
 - build the docker image using `Dockerfile` in the root directory
 - tag and push the image on `ghcr.io`
 
 👀 **Important!**
 
-Remember to add the package write permissions to the action https://github.com/users/OWNER/packages/container/REPOSITORY/settings
-
+Remember to add the package write permissions to the
+action https://github.com/users/OWNER/packages/container/REPOSITORY/settings
 
 ## Usage
 

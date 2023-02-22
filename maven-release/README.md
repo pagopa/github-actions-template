@@ -1,9 +1,11 @@
 # Release
+
 This action updates the version of the project using the semantic version and makes a release on GitHub.
 
 Note: The project must have [this structure](https://github.com/pagopa/template-java-spring-microservice).
 
 The action:
+
 - calls the `maven-semver` template to update the version of the project
 - pushes to GitHub
 - make a new Tag and Release on GitHub
@@ -18,6 +20,7 @@ The new version is saved in the output.
   uses: pagopa/github-actions-template/maven-release@v1
   with:
     semver: 'major'
+    github_token: ${{ secrets.GITHUB_TOKEN }}
       
 - run: echo "${{ steps.release.outputs.version }}"
 ```
@@ -30,6 +33,7 @@ The new version is saved in the output.
 | github_token | A GitHub token                  | **true** | `string`                                         |         |
 
 ## Output
+
 | Value   | Description |
 |---------|-------------|
 | version | New Version |

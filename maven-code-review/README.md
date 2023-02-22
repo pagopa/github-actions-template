@@ -1,9 +1,12 @@
 # Maven Code Review
+
 This action analyzes your **Java** code with sonarcloud for **maven**.
 
 👀 **Important!**
 
-Remember to add [jacoco plugin](https://github.com/pagopa/template-java-spring-microservice/blob/main/pom.xml#LL118-L153C16) in your pom.xml to calculate the coverage.
+Remember to
+add [jacoco plugin](https://github.com/pagopa/template-java-spring-microservice/blob/main/pom.xml#LL118-L153C16) in your
+pom.xml to calculate the coverage.
 
 ## Usage
 
