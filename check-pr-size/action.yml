@@ -125,24 +125,23 @@ runs:
               repo: context.repo.repo,
               body: 'This PR exceeds the recommended size of '+MAX+' lines. Please make sure you are NOT addressing multiple issues with one PR. _Note this PR might be rejected due to its size._'
             });
+          
+            let labels = await github.rest.issues.listLabelsOnIssue({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            if (labels.data.find(label => label.name === 'size/small')) {
+              github.rest.issues.removeLabel({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'size/small'
+              });
+            }
           }
 
-
-#
-#            let labels = await github.rest.issues.listLabelsOnIssue({
-#               issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo
-#            });
-#
-#            if (labels.data.find(label => label.name === 'size/small')) {
-#              github.rest.issues.removeLabel({
-#                  issue_number: context.issue.number,
-#                  owner: context.repo.owner,
-#                  repo: context.repo.repo,
-#                  name: 'size/small'
-#              });
-#            }
 #
 #            core.setFailed('PR is too large: ' + changes + ' changes.');
 #          }
