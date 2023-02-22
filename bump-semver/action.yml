@@ -29,12 +29,12 @@ runs:
         result-encoding: string
         script: |
           var { CURRENT_VERSION, SEMVER } = process.env
-          var versions = CURRENT_VERSION.replace('v','').trim('.');
+          var versions = CURRENT_VERSION.replace('v','').split('.');
 
           var major = parseInt(versions[0]);
           var minor = parseInt(versions[1]);
-          var patch = parseInt(versions[2].trim('-')[0]);
-          var buildNumber = parseInt(versions[2].trim('-')[1]);
+          var patch = parseInt(versions[2].split('-')[0]);
+          var buildNumber = parseInt(versions[2].split('-')[1]);
 
           var newVersion = "";
 
