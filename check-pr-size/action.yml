@@ -104,23 +104,23 @@ runs:
               repo: context.repo.repo,
               labels: ['size/large']
             });
+            let comments = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            for (const comment of comments.data) {
+              if (comment.body.includes('This PR exceeds the recommended size')){
+                github.rest.issues.deleteComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id
+                });
+              }
+            }
           }
 #
-#            let comments = await github.rest.issues.listComments({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo
-#            });
-#            for (const comment of comments.data) {
-#              if (comment.body.includes('This PR exceeds the recommended size')){
-#                github.rest.issues.deleteComment({
-#                  issue_number: context.issue.number,
-#                  owner: context.repo.owner,
-#                  repo: context.repo.repo,
-#                  comment_id: comment.id
-#                });
-#              }
-#            }
 #
 #            github.rest.issues.createComment({
 #              issue_number: context.issue.number,
