@@ -140,10 +140,8 @@ runs:
                   name: 'size/small'
               });
             }
+          
+            core.setFailed('PR is too large: ' + changes + ' changes.');
           }
 
 #
-#            core.setFailed('PR is too large: ' + changes + ' changes.');
-#          }
-
-
