@@ -67,32 +67,32 @@ runs:
             console.log('ignored lines: ' + ignored + ' , consider changes: ' + changes);
           }
 
-#          let { MIN } = process.env
-#          MIN = MIN ?? 200;
-#          console.log(MIN);
-#          if (changes < MIN){
-#            github.rest.issues.addLabels({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              labels: ['size/small']
-#            });
-#
-#            let labels = await github.rest.issues.listLabelsOnIssue({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo
-#            });
-#
-#            if (labels.data.find(label => label.name === 'size/large')){
-#              github.rest.issues.removeLabel({
-#                  issue_number: context.issue.number,
-#                  owner: context.repo.owner,
-#                  repo: context.repo.repo,
-#                  name: 'size/large'
-#              });
-#            }
-#          }
+          let { MIN } = process.env
+          MIN = MIN ?? 200;
+          console.log(MIN);
+          if (changes < MIN){
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['size/small']
+            });
+
+            let labels = await github.rest.issues.listLabelsOnIssue({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            if (labels.data.find(label => label.name === 'size/large')){
+              github.rest.issues.removeLabel({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'size/large'
+              });
+            }
+          }
 #
 #          let { MAX } = process.env
 #          MAX = MAX ?? 400;
