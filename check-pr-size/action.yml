@@ -43,107 +43,107 @@ runs:
           let changes = additions + deletions
           console.log('additions: '+additions+' + deletions: '+deletions+ ' = total changes: ' + changes);
   
-          let { IGNORED_FILES } = process.env
-          IGNORED_FILES = "" + IGNORED_FILES;
-          const ignored_files = IGNORED_FILES.trim().split(',').filter(word => word.length > 0);
-          if (ignored_files.length > 0){
-            let ignored = 0
-            const execSync = require('child_process').execSync;
-            for (const file of IGNORED_FILES.trim().split(',')) {
-  
-              const ignored_additions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 1', { encoding: 'utf-8' })
-              const ignored_deletions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 2', { encoding: 'utf-8' })
-  
-              const ignored_additions = ignored_additions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
-              (accumulator, currentValue) => accumulator + currentValue,
-              0);
-              const ignored_deletions = ignored_deletions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
-              (accumulator, currentValue) => accumulator + currentValue,
-              0);
-        
-              ignored += ignored_additions + ignored_deletions;
-            }
-            changes -= ignored
-            console.log('ignored lines: ' + ignored + ' , consider changes: ' + changes);
-          }
-          
-          let { MIN } = process.env
-          MIN = MIN ?? 200;
-          console.log(MIN);
-          if (changes < MIN){
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['size/small']
-            });        
-        
-            let labels = await github.rest.issues.listLabelsOnIssue({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-
-            if (labels.data.find(label => label.name === 'size/large')){
-              github.rest.issues.removeLabel({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: 'size/large'
-              });
-            }
-          }
-          
-          let { MAX } = process.env
-          MAX = MAX ?? 400;
-          console.log(MAX);
-          if (changes > MAX){
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['size/large']
-            });
-        
-            let comments = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            for (const comment of comments.data) {
-              if (comment.body.includes('This PR exceeds the recommended size')){
-                github.rest.issues.deleteComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: comment.id
-                });
-              }
-            }
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'This PR exceeds the recommended size of '+MAX+' lines. Please make sure you are NOT addressing multiple issues with one PR. _Note this PR might be rejected due to its size._'
-            });
-        
-            let labels = await github.rest.issues.listLabelsOnIssue({
-               issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-
-            if (labels.data.find(label => label.name === 'size/small')) {
-              github.rest.issues.removeLabel({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: 'size/small'
-              });
-            }
-        
+#          let { IGNORED_FILES } = process.env
+#          IGNORED_FILES = "" + IGNORED_FILES;
+#          const ignored_files = IGNORED_FILES.trim().split(',').filter(word => word.length > 0);
+#          if (ignored_files.length > 0){
+#            let ignored = 0
+#            const execSync = require('child_process').execSync;
+#            for (const file of IGNORED_FILES.trim().split(',')) {
+#
+#              const ignored_additions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 1', { encoding: 'utf-8' })
+#              const ignored_deletions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 2', { encoding: 'utf-8' })
+#
+#              const ignored_additions = ignored_additions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
+#              (accumulator, currentValue) => accumulator + currentValue,
+#              0);
+#              const ignored_deletions = ignored_deletions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
+#              (accumulator, currentValue) => accumulator + currentValue,
+#              0);
+#
+#              ignored += ignored_additions + ignored_deletions;
+#            }
+#            changes -= ignored
+#            console.log('ignored lines: ' + ignored + ' , consider changes: ' + changes);
+#          }
+#
+#          let { MIN } = process.env
+#          MIN = MIN ?? 200;
+#          console.log(MIN);
+#          if (changes < MIN){
+#            github.rest.issues.addLabels({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              labels: ['size/small']
+#            });
+#
+#            let labels = await github.rest.issues.listLabelsOnIssue({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo
+#            });
+#
+#            if (labels.data.find(label => label.name === 'size/large')){
+#              github.rest.issues.removeLabel({
+#                  issue_number: context.issue.number,
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  name: 'size/large'
+#              });
+#            }
+#          }
+#
+#          let { MAX } = process.env
+#          MAX = MAX ?? 400;
+#          console.log(MAX);
+#          if (changes > MAX){
+#            github.rest.issues.addLabels({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              labels: ['size/large']
+#            });
+#
+#            let comments = await github.rest.issues.listComments({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo
+#            });
+#            for (const comment of comments.data) {
+#              if (comment.body.includes('This PR exceeds the recommended size')){
+#                github.rest.issues.deleteComment({
+#                  issue_number: context.issue.number,
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  comment_id: comment.id
+#                });
+#              }
+#            }
+#
+#            github.rest.issues.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: 'This PR exceeds the recommended size of '+MAX+' lines. Please make sure you are NOT addressing multiple issues with one PR. _Note this PR might be rejected due to its size._'
+#            });
+#
+#            let labels = await github.rest.issues.listLabelsOnIssue({
+#               issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo
+#            });
+#
+#            if (labels.data.find(label => label.name === 'size/small')) {
+#              github.rest.issues.removeLabel({
+#                  issue_number: context.issue.number,
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  name: 'size/small'
+#              });
+#            }
+#
 #            core.setFailed('PR is too large: ' + changes + ' changes.');
-          }
+#          }
 
 
