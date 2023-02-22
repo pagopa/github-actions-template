@@ -43,30 +43,30 @@ runs:
           let changes = additions + deletions
           console.log('additions: '+additions+' + deletions: '+deletions+ ' = total changes: ' + changes);
   
-#          let { IGNORED_FILES } = process.env
-#          IGNORED_FILES = "" + IGNORED_FILES;
-#          const ignored_files = IGNORED_FILES.trim().split(',').filter(word => word.length > 0);
-#          if (ignored_files.length > 0){
-#            let ignored = 0
-#            const execSync = require('child_process').execSync;
-#            for (const file of IGNORED_FILES.trim().split(',')) {
-#
-#              const ignored_additions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 1', { encoding: 'utf-8' })
-#              const ignored_deletions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 2', { encoding: 'utf-8' })
-#
-#              const ignored_additions = ignored_additions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
-#              (accumulator, currentValue) => accumulator + currentValue,
-#              0);
-#              const ignored_deletions = ignored_deletions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
-#              (accumulator, currentValue) => accumulator + currentValue,
-#              0);
-#
-#              ignored += ignored_additions + ignored_deletions;
-#            }
-#            changes -= ignored
-#            console.log('ignored lines: ' + ignored + ' , consider changes: ' + changes);
-#          }
-#
+          let { IGNORED_FILES } = process.env
+          IGNORED_FILES = "" + IGNORED_FILES;
+          const ignored_files = IGNORED_FILES.trim().split(',').filter(word => word.length > 0);
+          if (ignored_files.length > 0){
+            let ignored = 0
+            const execSync = require('child_process').execSync;
+            for (const file of IGNORED_FILES.trim().split(',')) {
+
+              const ignored_additions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 1', { encoding: 'utf-8' })
+              const ignored_deletions_str = execSync('git --no-pager  diff --numstat origin/main..origin/${{ github.head_ref}} | grep ' + file + ' | cut -f 2', { encoding: 'utf-8' })
+
+              const ignored_additions = ignored_additions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
+              (accumulator, currentValue) => accumulator + currentValue,
+              0);
+              const ignored_deletions = ignored_deletions_str.split('\n').map(elem=> parseInt(elem || 0)).reduce(
+              (accumulator, currentValue) => accumulator + currentValue,
+              0);
+
+              ignored += ignored_additions + ignored_deletions;
+            }
+            changes -= ignored
+            console.log('ignored lines: ' + ignored + ' , consider changes: ' + changes);
+          }
+
 #          let { MIN } = process.env
 #          MIN = MIN ?? 200;
 #          console.log(MIN);
