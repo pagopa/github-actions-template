@@ -68,8 +68,7 @@ runs:
           }
 
           let { MIN } = process.env
-          MIN = MIN ?? 200;
-          console.log(MIN);
+          console.log('min = ' + MIN);
           if (changes < MIN){
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
@@ -93,11 +92,10 @@ runs:
               });
             }
           }
-#
-#          let { MAX } = process.env
-#          MAX = MAX ?? 400;
-#          console.log(MAX);
-#          if (changes > MAX){
+
+          let { MAX } = process.env
+          console.log('max = ' + MAX);
+          if (changes > MAX){
 #            github.rest.issues.addLabels({
 #              issue_number: context.issue.number,
 #              owner: context.repo.owner,
@@ -144,6 +142,6 @@ runs:
 #            }
 #
 #            core.setFailed('PR is too large: ' + changes + ' changes.');
-#          }
+          }
 
 
