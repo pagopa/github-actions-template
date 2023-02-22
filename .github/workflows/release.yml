@@ -1,0 +1,61 @@
+name: Release
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - main
+    types: [ closed ]
+
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    semver:
+      required: true
+      type: choice
+      description: Select the new Semantic Version
+      options:
+        - major
+        - minor
+        - patch
+        - buildNumber
+        - skip
+
+
+permissions:
+  packages: write
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get semver
+        id: get_semver
+        uses: pagopa/github-actions-template/semver-setup@main
+
+      - id: get_release
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          owner: pagopa
+          repo: github-actions-template
+          excludes: prerelease, draft
+
+      - name: Bump Version
+        id: bump_version
+        uses: pagopa/github-actions-template/bump-semver@v1
+        with:
+          current_version: ${{steps.get_release.outputs.release}}
+          semver: ${{steps.get_semver.outputs.semver}}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          name: ${{ steps.bump_version.outputs.new_version }}
+          body: Changelog Contents
+          token: ${{ secrets.GITHUB_TOKEN }}
