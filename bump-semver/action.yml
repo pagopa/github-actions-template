@@ -29,7 +29,7 @@ runs:
         result-encoding: string
         script: |
           var { CURRENT_VERSION, SEMVER } = process.env
-          var versions = LATEST_TAG.replace('v','').trim('.');
+          var versions = CURRENT_VERSION.replace('v','').trim('.');
 
           var major = parseInt(versions[0]);
           var minor = parseInt(versions[1]);
