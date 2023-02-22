@@ -119,15 +119,15 @@ runs:
                 });
               }
             }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'This PR exceeds the recommended size of '+MAX+' lines. Please make sure you are NOT addressing multiple issues with one PR. _Note this PR might be rejected due to its size._'
+            });
           }
-#
-#
-#            github.rest.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: 'This PR exceeds the recommended size of '+MAX+' lines. Please make sure you are NOT addressing multiple issues with one PR. _Note this PR might be rejected due to its size._'
-#            });
+
+
 #
 #            let labels = await github.rest.issues.listLabelsOnIssue({
 #               issue_number: context.issue.number,
