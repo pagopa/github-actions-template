@@ -94,9 +94,9 @@ runs:
             }
           }
 
-#          let { MAX } = process.env
-#          MAX = MAX ?? 400;
-#          console.log('max = ' + MAX);
+          let { MAX } = process.env
+          MAX = MAX ?? 400;
+          console.log('max = ' + MAX);
 #          if (changes > MAX){
 #            github.rest.issues.addLabels({
 #              issue_number: context.issue.number,
