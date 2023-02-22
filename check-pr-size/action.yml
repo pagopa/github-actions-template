@@ -43,7 +43,8 @@ runs:
           let changes = additions + deletions
           console.log('additions: '+additions+' + deletions: '+deletions+ ' = total changes: ' + changes);
   
-          const { IGNORED_FILES } = process.env
+          let { IGNORED_FILES } = process.env
+          IGNORED_FILES = "" + IGNORED_FILES;
           const ignored_files = IGNORED_FILES.trim().split(',').filter(word => word.length > 0);
           if (ignored_files.length > 0){
           let ignored = 0
