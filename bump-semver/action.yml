@@ -30,6 +30,8 @@ runs:
         script: |
           var { CURRENT_VERSION, SEMVER } = process.env
           var versions = CURRENT_VERSION.replace('v','').split('.');
+          
+          console.log(versions);
 
           var major = parseInt(versions[0]);
           var minor = parseInt(versions[1]);
@@ -51,8 +53,9 @@ runs:
             newVersion = 'v' + major.toString() + minor.toString() + patch.toString() + '-' + (buildNumber + 1)
           }
           if (SEMVER == 'skip'){
-            newVersion = LATEST_TAG
+            newVersion = CURRENT_VERSION
           }
+          console.log('new version: ' + newVersion);
           return newVersion;
 
 
