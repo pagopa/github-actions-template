@@ -7,7 +7,7 @@ Note: The project must have [this structure](https://github.com/pagopa/template-
 The action updates:
 
 - the pom version (`/pom.xml`)
-- the helm chart version (`/helm/values-*.yaml`)
+- the helm chart versions (`/helm/values-*.yaml`)
 - the openapi/swagger version (`/openapi/openapi.json` json or yaml)
 
 The new version is saved in the output.
@@ -20,15 +20,17 @@ The new version is saved in the output.
   uses: pagopa/github-actions-template/maven-semver@v1
   with:
     semver: 'major'
+    beta: false
       
 - run: echo "${{ steps.semver.outputs.version }}"
 ```
 
 ## Input
 
-| Param  | Description                     | Required | Values                                           | Default |
-|--------|---------------------------------|----------|--------------------------------------------------|---------|
-| semver | Select the new Semantic Version | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| Param  | Description                                                                                    | Required | Values                                           | Default |
+|--------|------------------------------------------------------------------------------------------------|----------|--------------------------------------------------|---------|
+| semver | Select the new Semantic Version                                                                | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| beta   | True if it is a beta version (it updates only the canary helm version, not the stable version) | **true** | `bool`                                           | false   |
 
 ## Output
 
