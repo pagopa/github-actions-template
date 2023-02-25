@@ -29,6 +29,7 @@ runs:
       run:
         echo $JSON
         echo $INPUTS
+      shell: bash
       env:
         JSON: ${{ toJSON(github) }}
         INPUTS: ${{ toJSON(inputs) }}
