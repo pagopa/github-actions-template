@@ -65,49 +65,6 @@ jobs:
             core.setFailed('Missing required labels')
 
 
-  check_format:
-    name: Check Format
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Formatting
-        id: format
-        continue-on-error: true
-        uses: axel-op/googlejavaformat-action@v3
-        with:
-          args: "--set-exit-if-changed"
-
-      - uses: actions/github-script@v6.3.3
-        if: steps.format.outcome != 'success'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            console.log(context);
-            var comments = await github.rest.issues.listComments({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo
-            });
-            for (const comment of comments.data) {
-              console.log(comment);
-              if (comment.body.includes('Comment this PR with')){
-                github.rest.issues.deleteComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: comment.id
-                })
-              }
-            }
-            github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: 'Comment this PR with *update_code* to format the code. Consider to use pre-commit to format the code.'
-            })
-            core.setFailed('Format your code.')
-
   check_size:
     runs-on: ubuntu-latest
     name: Check Size
