@@ -25,15 +25,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Dump GitHub context
-      run:
-        echo $JSON
-        echo $INPUTS
-      shell: bash
-      env:
-        JSON: ${{ toJSON(github) }}
-        INPUTS: ${{ toJSON(inputs) }}
-
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.ref_name}}

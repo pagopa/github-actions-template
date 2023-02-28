@@ -112,12 +112,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Check Size
     steps:
-
-      - name: Dump GitHub context
-        run: echo $JSON
-        env:
-          JSON: ${{ toJSON(github) }}
-
       - name: Check PR Size
         uses: pagopa/github-actions-template/check-pr-size@main
         with:
