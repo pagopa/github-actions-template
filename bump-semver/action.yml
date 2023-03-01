@@ -41,16 +41,16 @@ runs:
           var newVersion = "";
 
           if (SEMVER == 'major'){
-            newVersion = 'v' + (major + 1) + '.0.0' 
+            newVersion = (major + 1) + '.0.0' 
           }
           if (SEMVER == 'minor'){
-            newVersion = 'v' + major.toString() + '.' + (minor + 1) + '.0' 
+            newVersion = major.toString() + '.' + (minor + 1) + '.0' 
           } 
           if (SEMVER == 'patch'){
-            newVersion = 'v' + major.toString() + '.' + minor.toString() + '.' + (patch + 1)
+            newVersion = major.toString() + '.' + minor.toString() + '.' + (patch + 1)
           }
           if (SEMVER == 'buildNumber'){
-            newVersion = 'v' + major.toString() + '.' + minor.toString() + '.' + patch.toString() + '-' + (buildNumber + 1)
+            newVersion = major.toString() + '.' + minor.toString() + '.' + patch.toString() + '-' + (buildNumber + 1)
           }
           if (SEMVER == 'skip'){
             newVersion = CURRENT_VERSION

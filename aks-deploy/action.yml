@@ -2,6 +2,10 @@ name: Check PR Size
 description: "Check the size of a Pull Request"
 
 inputs:
+  branch:
+    required: true
+    description: The branch to deploy
+    type: string
   client_id:
     required: true
     description: Azure Client ID
@@ -34,21 +38,22 @@ inputs:
     required: true
     description: The resource group of the cluster
     type: string
-  version:
-    required: true
-    description: The Image version to deploy
-    type: string
   app_name:
     required: true
     description: The name of the application
     type: string
+  helm_upgrade_options:
+    required: false
+    description: options you can pass to helm upgrade command
+    type: string
+    default: ''
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
       with:
-        ref: ${{ github.ref_name}}
+        ref: ${{ inputs.branch}}
 
     - name: Read terraform version
       shell: bash
@@ -90,6 +95,6 @@ runs:
       shell: bash
       run: helm upgrade --namespace ${{ inputs.namespace }}
         --install --values ./helm/values-${{ inputs.env }}.yaml
-        --set microservice-chart.image.tag=${{ inputs.version }}
+        ${{inputs.helm_upgrade_options}}
         --wait --timeout 5m0s
         ${{ inputs.app_name }} ./helm
