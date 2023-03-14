@@ -2,6 +2,30 @@ name: Deploy helm chart
 description: "Deploy Helm chart inside aks"
 
 inputs:
+  # project inputs
+  branch:
+    required: true
+    description: The branch to deploy
+  namespace:
+    required: true
+    description: The namespace on AKS
+  app_name:
+    required: true
+    description: The name of the application
+  env:
+    required: true
+    description: The name of the environment
+  helm_upgrade_options:
+    required: false
+    description: options you can pass to helm upgrade command
+    default: ''
+  # AKS info
+  cluster_name:
+    required: true
+    description: The name of the cluster
+  resource_group:
+    required: true
+    description: The resource group of the cluster
   # Azure inputs
   client_id:
     required: true
@@ -12,26 +36,6 @@ inputs:
   tenant_id:
     required: true
     description: Azure Tenant ID
-  # project inputs
-  branch:
-    required: true
-    description: The branch to deploy
-  namespace:
-    required: true
-    description: The namespace on AKS
-  cluster_name:
-    required: true
-    description: The name of the cluster
-  resource_group:
-    required: true
-    description: The resource group of the cluster
-  app_name:
-    required: true
-    description: The name of the application
-  helm_upgrade_options:
-    required: false
-    description: options you can pass to helm upgrade command
-    default: ''
 
 runs:
   using: "composite"
@@ -68,8 +72,9 @@ runs:
 
     - name: Helm Deploy
       shell: bash
+      working-directory: ./helm/devopslab/diego
       run: |
         helm upgrade --namespace ${{ inputs.namespace }} \
-          --install --values ./helm/values-${{ inputs.env }}.yaml \
+          --install --values ./values-${{ inputs.env }}.yaml \
           ${{inputs.helm_upgrade_options}} --wait --timeout 5m0s \
-          ${{ inputs.app_name }} ./helm
+          ${{ inputs.app_name }} ./
