@@ -71,6 +71,7 @@ runs:
 
     - name: Check helm
       shell: bash
+      working-directory: ./helm/devopslab/diego
       run: |
         helm version
 
@@ -78,8 +79,11 @@ runs:
       shell: bash
       working-directory: ./helm/devopslab/diego
       run: |
+        echo "📌 check helm version"
+        helm version
+        echo "init repo add"
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
-        helm dep build helm
+        helm dep build .
         echo "✅ aks blueprint configured as expected"
 
     - name: 🚀 Helm Deploy
