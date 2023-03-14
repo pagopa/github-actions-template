@@ -64,18 +64,17 @@ runs:
         admin: 'false'
         use-kubelogin: 'true'
 
-    - name: Helm configure repos
-      shell: bash
-      run: |
-        helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
-        helm dep build helm
+    # - name: Helm configure repos
+    #   shell: bash
+    #   run: |
+    #     helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
+    #     helm dep build helm
 
     - name: test
       shell: bash
       run: |
         pwd
         ls -la
-
 
     - name: Helm Deploy
       shell: bash
