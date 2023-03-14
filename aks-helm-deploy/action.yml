@@ -70,10 +70,20 @@ runs:
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build helm
 
+    - name: test
+      shell: bash
+      run: |
+        pwd
+        ls -la
+
+
     - name: Helm Deploy
       shell: bash
       working-directory: ./helm/devopslab/diego
       run: |
+        pwd
+        ls -la
+
         helm upgrade --namespace ${{ inputs.namespace }} \
           --install --values ./values-${{ inputs.env }}.yaml \
           ${{inputs.helm_upgrade_options}} --wait --timeout 5m0s \
