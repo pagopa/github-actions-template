@@ -6,31 +6,35 @@ inputs:
   namespace:
     required: true
     description: The namespace on AKS
-  release_name:
+  release-name:
     required: true
     description: The release name of the chart
-  values_file_name:
+  values-file-name:
     required: true
     description: The values file name. (e.g. values-dev.yaml)
-  helm_upgrade_options:
+  chart-path:
+    required: false
+    description: The path to the chart. (defaults to helm/)
+    default: "helm/"
+  helm-upgrade-options:
     required: false
     description: options you can pass to helm upgrade command
     default: ''
   # AKS info
-  aks_name:
+  aks-name:
     required: true
     description: The name of the cluster
-  aks_resource_group:
+  aks-resource-group:
     required: true
     description: The resource group of the cluster
   # Azure inputs
-  client_id:
+  client-id:
     required: true
     description: Azure Client ID
-  subscription_id:
+  subscription-id:
     required: true
     description: Azure Subscription ID
-  tenant_id:
+  tenant-id:
     required: true
     description: Azure Tenant ID
 
@@ -40,53 +44,36 @@ runs:
     - name: Login
       uses: azure/login@89d153571fe9a34ed70fcf9f1d95ab8debea7a73
       with:
-        client-id: ${{ inputs.client_id }}
-        tenant-id: ${{ inputs.tenant_id }}
-        subscription-id: ${{ inputs.subscription_id }}
-
-    # - name: Set up kubelogin for non-interactive login
-    #   uses: azure/use-kubelogin@v1
-    #   with:
-    #     kubelogin-version: 'v0.0.24'
+        client-id: ${{ inputs.client-id }}
+        tenant-id: ${{ inputs.tenant-id }}
+        subscription-id: ${{ inputs.subscription-id }}
 
     - name: Gets K8s context
       uses: azure/aks-set-context@v3
       with:
-        resource-group: ${{inputs.aks_resource_group}}
-        cluster-name: ${{inputs.aks_name}}
+        resource-group: ${{inputs.aks-resource-group}}
+        cluster-name: ${{inputs.aks-name}}
         admin: 'false'
         use-kubelogin: 'true'
 
-    # - uses: azure/setup-helm@v3
-    #   with:
-    #     version: 'v3.11.2'
-    #   id: install_helm
-
-    # - name: Check helm
-    #   shell: bash
-    #   working-directory: ./helm/devopslab/diego
-    #   run: |
-    #     helm version
-
     - name: 🛠️ Helm configure repos
       shell: bash
-      working-directory: ./helm/devopslab/diego
+      working-directory: ./${{ input.chart-path }}
       run: |
-        # echo "📌 check helm version"
-        # helm version
-        # echo "init repo add"
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build .
         echo "✅ aks blueprint configured"
 
     - name: 🚀 Helm Deploy
       shell: bash
-      working-directory: ./helm/devopslab/diego
+      working-directory: ./${{ input.chart-path }}
       run: |
         helm upgrade --install \
           --namespace ${{ inputs.namespace }} \
-          --values ./${{ inputs.values_file_name }} \
+          --values ./${{ inputs.values-file-name }} \
           --wait --timeout 5m0s \
-          ${{inputs.helm_upgrade_options}} \
-          ${{ inputs.release_name }} \
+          ${{inputs.helm-upgrade-options}} \
+          ${{ inputs.release-name }} \
           ./
+
+        echo "✅ Helm deployed"
