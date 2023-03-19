@@ -68,6 +68,8 @@ runs:
       shell: bash
       working-directory: ./${{ inputs.chart-path }}
       run: |
+        echo "🚀 Launch helm deploy"
+
         helm upgrade --install \
           --namespace ${{ inputs.namespace }} \
           --values ./${{ inputs.values-file-name }} \
