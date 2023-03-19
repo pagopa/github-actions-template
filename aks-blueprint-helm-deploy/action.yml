@@ -58,7 +58,7 @@ runs:
 
     - name: 🛠️ Helm configure repos
       shell: bash
-      working-directory: ./${{ input.chart-path }}
+      working-directory: ./${{ inputs.chart-path }}
       run: |
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build .
@@ -66,7 +66,7 @@ runs:
 
     - name: 🚀 Helm Deploy
       shell: bash
-      working-directory: ./${{ input.chart-path }}
+      working-directory: ./${{ inputs.chart-path }}
       run: |
         helm upgrade --install \
           --namespace ${{ inputs.namespace }} \
