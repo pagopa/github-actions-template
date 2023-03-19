@@ -3,9 +3,6 @@ description: "Deploy Helm chart inside aks"
 
 inputs:
   # project inputs
-  branch:
-    required: true
-    description: The branch to deploy
   namespace:
     required: true
     description: The namespace on AKS
