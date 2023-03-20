@@ -19,8 +19,11 @@ inputs:
 
 outputs:
   version:
-    description: "New Version"
+    description: "New App Version"
     value: ${{ steps.get_app_version.outputs.version }}
+  chart_version:
+    description: "New Chart Version"
+    value: ${{ steps.get_chart_version.outputs.chart_version }}
 
 runs:
   using: "composite"
@@ -82,7 +85,7 @@ runs:
       run: |
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
-          yq -r ".version" "$CHART_FILE" >> $GITHUB_OUTPUT
+          echo "chart_version=$(yq -r ".version" "$CHART_FILE")" >> $GITHUB_OUTPUT
         fi
       shell: bash
 
