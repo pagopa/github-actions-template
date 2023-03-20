@@ -16,7 +16,7 @@ inputs:
     required: true
     type: boolean
     description: True if it is a beta version (update canary helm version)
-      -
+
 outputs:
   version:
     description: "New Version"
