@@ -87,8 +87,6 @@ runs:
         if [[ -f "$CHART_FILE" ]]; then
           echo "chart_version=$(yq -r ".version" "$CHART_FILE")" >> $GITHUB_ENV
         fi
-        yq -r ".version" "$CHART_FILE"
-        echo "chart_version=$(yq -r ".version" "$CHART_FILE")"
       shell: bash
 
     - name: Bump Chart Version
