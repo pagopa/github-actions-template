@@ -18,9 +18,9 @@ inputs:
     description: True if it is a beta version (update canary helm version)
 
 outputs:
-  version:
+  app_version:
     description: "New App Version"
-    value: ${{ steps.get_app_version.outputs.version }}
+    value: ${{ steps.get_app_version.outputs.app_version }}
   chart_version:
     description: "New Chart Version"
     value: ${{ steps.get_chart_version.outputs.chart_version }}
@@ -77,7 +77,7 @@ runs:
       name: Get Version
       run: |
         echo "$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)"
-        echo "version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+        echo "app_version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
       shell: bash
 
     - id: get_chart_version
@@ -95,7 +95,7 @@ runs:
       uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver:  ${{( inputs.beta && 'patch') || 'minor' }}
-        current_version: ${{ steps.get_chart_version.outputs.version }}
+        current_version: ${{ steps.get_chart_version.outputs.chart_version }}
 
     - name: Update Chart Version
       if: ${{ inputs.semver != 'skip' }}
@@ -114,8 +114,8 @@ runs:
         CHART_FILE="helm/Chart.yaml"
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
-          yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
+          yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.app_version }}\"" "$i"
+          yq -i ".appVersion = \"${{ steps.get_app_version.outputs.app_version }}\"" "$CHART_FILE"
           git add "$i"
         done
 
@@ -125,7 +125,7 @@ runs:
       run: |
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_app_version.outputs.app_version }}\"" "$i"
           git add "$i"
         done
 
@@ -135,17 +135,17 @@ runs:
       run: |
         for i in openapi/*.json; do
           [ -f "$i" ] || break
-          cat <<< "$(jq ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i")" > "$i"
+          cat <<< "$(jq ".info.version = \"${{ steps.get_app_version.outputs.app_version }}\"" "$i")" > "$i"
           git add $i
         done
         for i in openapi/*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.app_version }}\"" "$i"
           git add "$i"
         done
         for i in openapi/*.yml; do
           [ -f "$i" ] || break
-          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.app_version }}\"" "$i"
           git add "$i"
         done
 
