@@ -85,8 +85,10 @@ runs:
       run: |
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
-          echo "chart_version=$(yq -r ".version" "$CHART_FILE")" >> $GITHUB_OUTPUT
+          echo "chart_version=$(yq -r ".version" "$CHART_FILE")" >> $GITHUB_ENV
         fi
+        yq -r ".version" "$CHART_FILE"
+        echo "chart_version=$(yq -r ".version" "$CHART_FILE")"
       shell: bash
 
     - name: Bump Chart Version
@@ -95,7 +97,7 @@ runs:
       uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver:  ${{( inputs.beta && 'patch') || 'minor' }}
-        current_version: ${{ steps.get_chart_version.outputs.chart_version }}
+        current_version: ${{ env.chart_version }}
 
     - name: Update Chart Version
       if: ${{ inputs.semver != 'skip' }}
