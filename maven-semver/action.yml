@@ -89,7 +89,7 @@ runs:
     - name: Bump Chart Version
       id: bump_chart_version
       if: ${{ inputs.semver != 'skip' }}
-      uses: pagopa/github-actions-template/bump-semver@v1
+      uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver:  ${{( inputs.beta && 'patch') || 'minor' }}
         current_version: ${{ steps.get_chart_version.outputs.version }}
