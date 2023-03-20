@@ -24,7 +24,7 @@ inputs:
 outputs:
   version:
     description: "New Version"
-    value: ${{ steps.semver.outputs.app_version }}
+    value: ${{ steps.semver.outputs.version }}
 
 runs:
   using: "composite"
@@ -45,7 +45,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        echo "${{ steps.semver.outputs.app_version }}"
+        echo "${{ steps.semver.outputs.version }}"
         git ls-files . | grep 'pom.xml'  | xargs git add
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
@@ -58,8 +58,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
-        tag: ${{ steps.semver.outputs.app_version }}
-        name: Release ${{ steps.semver.outputs.app_version }}
+        tag: ${{ steps.semver.outputs.version }}
+        name: Release ${{ steps.semver.outputs.version }}
         makeLatest: latest
         generateReleaseNotes: true
         prerelease: ${{ (inputs.beta && 'true') || 'false' }}
