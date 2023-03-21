@@ -17,9 +17,15 @@ inputs:
       - buildNumber
       - skip
   beta:
-    required: true
+    required: false
     type: boolean
     description: True if it is a beta version (update canary helm version)
+    default: false
+  skip_ci:
+    required: false
+    type: boolean
+    description: True you want skip the CI workflows on release commit
+    default: true
 
 outputs:
   version:
@@ -49,7 +55,7 @@ runs:
         git ls-files . | grep 'pom.xml'  | xargs git add
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
-        git commit -m "Bump version [skip ci]" || exit 0
+        git commit -m "Bump to version ${{ steps.semver.outputs.version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
