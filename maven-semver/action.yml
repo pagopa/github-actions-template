@@ -12,11 +12,18 @@ inputs:
       - patch
       - buildNumber
       - skip
+  beta:
+    required: true
+    type: boolean
+    description: True if it is a beta version (update canary helm version)
 
 outputs:
   version:
-    description: "New Version"
-    value: ${{ steps.get_version.outputs.version }}
+    description: "New App Version"
+    value: ${{ steps.get_app_version.outputs.version }}
+  chart_version:
+    description: "New Chart Version"
+    value: ${{ steps.get_chart_version.outputs.chart_version }}
 
 runs:
   using: "composite"
@@ -66,46 +73,79 @@ runs:
       if: ${{ inputs.semver == 'patch' }}
       shell: bash
 
-    - id: get_version
+    - id: get_app_version
       name: Get Version
       run: |
         echo "$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)"
         echo "version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
       shell: bash
 
+    - id: get_chart_version
+      name: Get Version
+      run: |
+        CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          echo "chart_version=$(yq -r ".version" "$CHART_FILE")" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Bump Chart Version
+      id: bump_chart_version
+      if: ${{ inputs.semver != 'skip' }}
+      uses: pagopa/github-actions-template/bump-semver@main
+      with:
+        semver:  ${{( inputs.beta && 'patch') || 'minor' }}
+        current_version: ${{ env.chart_version }}
+
+    - name: Update Chart Version
+      if: ${{ inputs.semver != 'skip' }}
+      shell: bash
+      run: |
+        CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          yq -i ".version = \"${{ steps.bump_chart_version.outputs.new_version }}\"" "$CHART_FILE"
+          git add "$CHART_FILE"
+        fi
+
     - name: Update Version Helm
+      if: ${{ inputs.semver != 'skip' && !inputs.beta }}
+      shell: bash
+      run: |
+        CHART_FILE="helm/Chart.yaml"
+        for i in helm/values-*.yaml; do
+          [ -f "$i" ] || break
+          yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
+          git add "$i"
+        done
+
+    - name: Update Beta Version Helm
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".microservice-chart.image.tag = \"${{ steps.get_version.outputs.version }}\"" "$i"
-          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_version.outputs.version }}\"" "$i"
+          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           git add "$i"
         done
-        CHART_FILE="helm/Chart.yaml"
-        if [[ -f "$CHART_FILE" ]]; then
-          yq -i ".version = \"${{ steps.get_version.outputs.version }}\"" "$CHART_FILE"
-          yq -i ".appVersion = \"${{ steps.get_version.outputs.version }}\"" "$CHART_FILE"
-          git add "$CHART_FILE"
-        fi
+
     - name: Update Openapi/Swagger Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
         for i in openapi/*.json; do
           [ -f "$i" ] || break
-          cat <<< "$(jq ".info.version = \"${{ steps.get_version.outputs.version }}\"" "$i")" > "$i"
+          cat <<< "$(jq ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i")" > "$i"
           git add $i
         done
         for i in openapi/*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".info.version = \"${{ steps.get_version.outputs.version }}\"" "$i"
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           git add "$i"
         done
         for i in openapi/*.yml; do
           [ -f "$i" ] || break
-          yq -i ".info.version = \"${{ steps.get_version.outputs.version }}\"" "$i"
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           git add "$i"
         done
 
