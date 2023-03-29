@@ -22,6 +22,8 @@ The new version is saved in the output.
     semver: 'major'
       
 - run: echo "${{ steps.semver.outputs.version }}"
+
+- run: echo "${{ steps.semver.outputs.chart_version }}"
 ```
 
 ## Input
@@ -32,6 +34,7 @@ The new version is saved in the output.
 
 ## Output
 
-| Value   | Description |
-|---------|-------------|
-| version | New Version |
+| Value         | Description       |
+|---------------|-------------------|
+| version       | New App Version   |
+| chart_version | New Chart Version |
