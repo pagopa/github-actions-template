@@ -6,6 +6,10 @@ inputs:
     required: true
     type: string
     description: Used to tag the image (for example the version)
+  build_args:
+    required: false
+    type: string
+    description: optional docker build arguments(with format 'key=value')
   github_token:
     required: true
     type: string
@@ -44,4 +48,5 @@ runs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        build-args: ${{ inputs.build_args }}
 

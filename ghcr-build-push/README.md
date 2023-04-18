@@ -20,15 +20,17 @@ action https://github.com/users/OWNER/packages/container/REPOSITORY/settings
   with:
     tag: '1.0.0'
     github_token: ${{ secrets.GITHUB_TOKEN }}
+    build_args: 'key=value'
       
 ```
 
 ## Input
 
-| Param        | Description                                     | Required | Values   | Default |
-|--------------|-------------------------------------------------|----------|----------|---------|
-| tag          | The github tag of application to build and push | **true** | `string` |         |
-| github_token | A GitHub token                                  | **true** | `string` |         |
+| Param        | Description                                              | Required | Values   | Default |
+|--------------|----------------------------------------------------------|----------|----------|---------|
+| tag          | The github tag of application to build and push          | **true** | `string` |         |
+| github_token | A GitHub token                                           | **true** | `string` |         |
+| build_args   | optional docker build arguments(with format 'key=value') | false    | `string` |         |
 
 ## Output
 
