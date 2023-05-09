@@ -82,11 +82,11 @@ runs:
       run: |
         echo "🚀 Launch helm deploy"
 
-        helm upgrade --namespace ${{ inputs.namespace }}
-        --install --values ./helm/values-${{ inputs.env }}.yaml
-        ${{inputs.helm_upgrade_options}}
-        --wait --timeout 5m0s
-        ${{ inputs.app_name }} ./helm
+        helm upgrade --namespace ${{ inputs.namespace }} \
+          --install --values ./helm/values-${{ inputs.env }}.yaml \
+          ${{inputs.helm_upgrade_options}} \
+          --wait --timeout 5m0s \
+          ${{ inputs.app_name }} ./helm
         
         echo "✅ Helm deployed"
 
