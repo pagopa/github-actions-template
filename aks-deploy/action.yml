@@ -55,21 +55,6 @@ runs:
       with:
         ref: ${{ inputs.branch}}
 
-    - name: Read terraform version
-      shell: bash
-      run: |
-        echo "TERRAFORM_VERSION=`cat .terraform-version`" >> $GITHUB_ENV
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@8feba2b913ea459066180f9cb177f58a881cf146
-      with:
-        terraform_version: ${{ env.TERRAFORM_VERSION }}
-
-    - name: Set up kubelogin for non-interactive login
-      uses: azure/use-kubelogin@v1
-      with:
-        kubelogin-version: 'v0.0.24'
-
     - name: Login
       uses: azure/login@89d153571fe9a34ed70fcf9f1d95ab8debea7a73
       with:
@@ -85,16 +70,23 @@ runs:
         admin: 'false'
         use-kubelogin: 'true'
 
-    - name: Helm Setup
+    - name: 🛠️ Helm configure repos
       shell: bash
       run: |
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build helm
+        echo "✅ aks blueprint configured"
 
-    - name: Helm Deploy
+    - name: 🚀 Helm Deploy
       shell: bash
-      run: helm upgrade --namespace ${{ inputs.namespace }}
+      run: |
+        echo "🚀 Launch helm deploy"
+
+        helm upgrade --namespace ${{ inputs.namespace }}
         --install --values ./helm/values-${{ inputs.env }}.yaml
         ${{inputs.helm_upgrade_options}}
         --wait --timeout 5m0s
         ${{ inputs.app_name }} ./helm
+        
+        echo "✅ Helm deployed"
+
