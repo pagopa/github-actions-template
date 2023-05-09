@@ -9,6 +9,8 @@ on:
       - 'CODEOWNERS'
       - '**.md'
       - '.**'
+  # Trigger the workflow by dispatching
+  workflow_dispatch:
 
 jobs:
   release:
