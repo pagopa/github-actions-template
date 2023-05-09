@@ -1,5 +1,5 @@
 name: Check PR Size
-description: "Check the size of a Pull Request"
+description: "Check the size of a Pull Request" 
 
 inputs:
   branch:
