@@ -1,4 +1,4 @@
-name: Check PR Size
+name: Deploy helm chart
 description: "Check the size of a Pull Request" 
 
 inputs:
