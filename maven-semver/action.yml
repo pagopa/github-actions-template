@@ -108,10 +108,13 @@ runs:
       shell: bash
       run: |
         CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
+          git add "$CHART_FILE"
+        fi
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
           yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
-          yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
           git add "$i"
         done
 
