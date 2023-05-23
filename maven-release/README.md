@@ -21,7 +21,6 @@ The new version is saved in the output.
   with:
     semver: 'major'
     github_token: ${{ secrets.GITHUB_TOKEN }}
-    beta: false
     skip_ci: true
       
 - run: echo "${{ steps.release.outputs.version }}"
@@ -33,7 +32,6 @@ The new version is saved in the output.
 |--------------|------------------------------------------------------|----------|--------------------------------------------------|---------|
 | semver       | Select the new Semantic Version                      | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
 | github_token | A GitHub token                                       | **true** | `string`                                         |         |
-| beta         | True if you want deploy on canary                    | false    | `boolean`                                        | false   |  
 | skip_ci      | True if you want skip CI workflows on commit release | false    | `boolean`                                        | true    |  
 
 ## Output
