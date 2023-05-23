@@ -47,18 +47,3 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        id: docker_build_push
-        if: steps.release.outputs.new_release_published == 'true'
-        # from https://github.com/docker/build-push-action/commits/master
-        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:v${{ steps.release.outputs.new_release_version }}
-          labels: |
-            maintainer=https://pagopa.it
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
