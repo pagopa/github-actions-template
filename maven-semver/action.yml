@@ -12,10 +12,6 @@ inputs:
       - patch
       - buildNumber
       - skip
-  beta:
-    required: true
-    type: boolean
-    description: True if it is a beta version (update canary helm version)
 
 outputs:
   version:
@@ -94,7 +90,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
-        semver:  ${{( inputs.beta && 'patch') || 'minor' }}
+        semver: 'minor'
         current_version: ${{ env.chart_version }}
 
     - name: Update Chart Version
@@ -108,7 +104,7 @@ runs:
         fi
 
     - name: Update Version Helm
-      if: ${{ inputs.semver != 'skip' && !inputs.beta }}
+      if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
         CHART_FILE="helm/Chart.yaml"
@@ -116,16 +112,6 @@ runs:
           [ -f "$i" ] || break
           yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
-          git add "$i"
-        done
-
-    - name: Update Beta Version Helm
-      if: ${{ inputs.semver != 'skip' }}
-      shell: bash
-      run: |
-        for i in helm/values-*.yaml; do
-          [ -f "$i" ] || break
-          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           git add "$i"
         done
 

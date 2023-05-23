@@ -16,11 +16,6 @@ inputs:
       - patch
       - buildNumber
       - skip
-  beta:
-    required: false
-    type: boolean
-    description: True if it is a beta version (update canary helm version)
-    default: false
   skip_ci:
     required: false
     type: boolean
@@ -45,7 +40,6 @@ runs:
       uses: pagopa/github-actions-template/maven-semver@main
       with:
         semver: ${{inputs.semver}}
-        beta: ${{inputs.beta}}
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
@@ -68,4 +62,4 @@ runs:
         name: Release ${{ steps.semver.outputs.version }}
         makeLatest: latest
         generateReleaseNotes: true
-        prerelease: ${{ (inputs.beta && 'true') || 'false' }}
+        prerelease: false
