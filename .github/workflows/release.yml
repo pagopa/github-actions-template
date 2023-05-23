@@ -37,13 +37,3 @@ jobs:
             @semantic-release/git@10.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Log in to the Container registry
-        id: docker_login
-        if: steps.release.outputs.new_release_published == 'true'
-        # from https://github.com/docker/login-action/commits/master
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
