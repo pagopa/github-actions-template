@@ -109,7 +109,7 @@ runs:
         fi
 
     - name: Update Stable Version Helm
-      if: ${{ inputs.semver != 'skip' && inputs.beta == 'false' }}
+      if: ${{ (inputs.beta) && (inputs.semver != 'skip')  }}
       shell: bash
       run: |
         CHART_FILE="helm/Chart.yaml"
@@ -124,9 +124,10 @@ runs:
         done
 
     - name: Update Canary Version Helm
-      if: ${{ inputs.semver != 'skip' && inputs.beta == 'true' }}
+      if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
+        echo ${{ inputs.beta }}
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
