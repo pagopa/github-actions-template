@@ -95,7 +95,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
-        semver: ${{ (inputs.beta && 'patch') || 'minor' }}
+        semver: ${{ (inputs.beta == 'true' && 'patch') || 'minor' }}
         current_version: ${{ env.chart_version }}
 
     - name: Update Chart Version
@@ -109,10 +109,9 @@ runs:
         fi
 
     - name: Update Stable Version Helm
-      if: ${{ inputs.semver != 'skip' && inputs.beta == false }}
+      if: ${{ (inputs.beta == 'false') && (inputs.semver != 'skip')  }}
       shell: bash
       run: |
-        echo ${{inputs.beta}}
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
@@ -125,10 +124,9 @@ runs:
         done
 
     - name: Update Canary Version Helm
-      if: ${{ inputs.semver != 'skip' && inputs.beta == true }}
+      if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        echo ${{inputs.beta}}
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
