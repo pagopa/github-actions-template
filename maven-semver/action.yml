@@ -112,6 +112,7 @@ runs:
       if: ${{ inputs.semver != 'skip' && inputs.beta == false }}
       shell: bash
       run: |
+        echo ${{inputs.beta}}
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
@@ -127,6 +128,7 @@ runs:
       if: ${{ inputs.semver != 'skip' && inputs.beta == true }}
       shell: bash
       run: |
+        echo ${{inputs.beta}}
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
