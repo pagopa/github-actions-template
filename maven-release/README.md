@@ -22,17 +22,19 @@ The new version is saved in the output.
     semver: 'major'
     github_token: ${{ secrets.GITHUB_TOKEN }}
     skip_ci: true
+    beta: false
       
 - run: echo "${{ steps.release.outputs.version }}"
 ```
 
 ## Input
 
-| Param        | Description                                          | Required | Values                                           | Default |
-|--------------|------------------------------------------------------|----------|--------------------------------------------------|---------|
-| semver       | Select the new Semantic Version                      | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
-| github_token | A GitHub token                                       | **true** | `string`                                         |         |
-| skip_ci      | True if you want skip CI workflows on commit release | false    | `boolean`                                        | true    |  
+| Param        | Description                                               | Required | Values                                           | Default |
+|--------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
+| semver       | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| github_token | A GitHub token                                            | **true** | `string`                                         |         |
+| beta         | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
+| skip_ci      | True if you want skip CI workflows on commit release      | false    | `boolean`                                        | true    |  
 
 ## Output
 

@@ -20,6 +20,7 @@ The new version is saved in the output.
   uses: pagopa/github-actions-template/maven-semver@v1
   with:
     semver: 'major'
+    beta: false
       
 - run: echo "${{ steps.semver.outputs.version }}"
 
@@ -28,9 +29,10 @@ The new version is saved in the output.
 
 ## Input
 
-| Param  | Description                     | Required | Values                                           | Default |
-|--------|---------------------------------|----------|--------------------------------------------------|---------|
-| semver | Select the new Semantic Version | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| Param  | Description                                               | Required | Values                                           | Default |
+|--------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
+| semver | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| beta   | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
 
 ## Output
 

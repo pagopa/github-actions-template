@@ -21,6 +21,11 @@ inputs:
     type: boolean
     description: True you want skip the CI workflows on release commit
     default: true
+  beta:
+    required: true
+    type: boolean
+    description: True if it is a beta version (update canary helm version)
+
 
 outputs:
   version:
@@ -40,6 +45,8 @@ runs:
       uses: pagopa/github-actions-template/maven-semver@main
       with:
         semver: ${{inputs.semver}}
+        beta: ${{inputs.beta}}
+
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
