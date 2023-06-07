@@ -111,7 +111,6 @@ runs:
         fi
 
     - name: Update Stable Version Helm
-      if: ${{ (inputs.beta != 'true') && (inputs.semver != 'skip')  }}
       if: ${{ (inputs.beta != 'true') }}
       shell: bash
       run: |
