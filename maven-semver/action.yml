@@ -109,7 +109,7 @@ runs:
         fi
 
     - name: Update Stable Version Helm
-      if: ${{ (inputs.beta == 'false') && (inputs.semver != 'skip')  }}
+      if: ${{ (inputs.beta != 'true') && (inputs.semver != 'skip')  }}
       shell: bash
       run: |
         CHART_FILE="helm/Chart.yaml"
