@@ -99,14 +99,12 @@ runs:
 
     - name: Bump Chart Version
       id: bump_chart_version
-      if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
-        semver: ${{ (inputs.beta == 'true' && 'patch') || 'minor' }}
+        semver: ${{ inputs.semver }}
         current_version: ${{ env.chart_version }}
 
     - name: Update Chart Version
-      if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
         echo "📑 Bump Chart Version to ${{ steps.bump_chart_version.outputs.new_version }}"
