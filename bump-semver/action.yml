@@ -31,8 +31,6 @@ runs:
           var { CURRENT_VERSION, SEMVER } = process.env
           var versions = CURRENT_VERSION.replace('v','').split('.');
           
-          console.log(versions);
-
           var major = parseInt(versions[0] ?? '0');
           var minor = parseInt(versions[1] ?? '0');
           var patch = parseInt((versions[2] ?? '0').split('-')[0] ?? '0');
