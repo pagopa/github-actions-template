@@ -35,6 +35,14 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Input Log
+      run: |
+        echo "📝 Inputs"
+        echo "semver: ${{ inputs.semver}}" 
+        echo "beta: ${{ inputs.beta}}"
+        echo "skip_ci: ${{ inputs.skip_ci}}"
+      shell: bash
+
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.ref_name}}
