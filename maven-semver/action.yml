@@ -102,7 +102,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        echo '📑 Bump Chart Version to ${{ steps.bump_chart_version.outputs.new_version }}"
+        echo "📑 Bump Chart Version to ${{ steps.bump_chart_version.outputs.new_version }}"
         
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
@@ -114,8 +114,8 @@ runs:
       if: ${{ (inputs.beta != 'true') }}
       shell: bash
       run: |
-        echo '🚀 Bump Canary Version to ${{ steps.get_app_version.outputs.version }}"
-
+        echo "🚀 Bump Canary Version to ${{ steps.get_app_version.outputs.version }}"
+        
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
           yq -i ".appVersion = \"${{ steps.get_app_version.outputs.version }}\"" "$CHART_FILE"
@@ -130,7 +130,7 @@ runs:
     - name: Update Canary Version Helm
       shell: bash
       run: |
-        echo '🐤 Bump Canary Version to ${{ steps.get_app_version.outputs.version }}"
+        echo "🐤 Bump Canary Version to ${{ steps.get_app_version.outputs.version }}"
         
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
@@ -147,7 +147,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        echo '📑 Bump Openapi Version to ${{ steps.get_app_version.outputs.version }}"
+        echo "📑 Bump Openapi Version to ${{ steps.get_app_version.outputs.version }}"
 
         for i in openapi/*.json; do
           [ -f "$i" ] || break
