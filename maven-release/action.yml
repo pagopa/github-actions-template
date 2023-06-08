@@ -53,6 +53,11 @@ runs:
       with:
         token: ${{ inputs.github_token }}
 
+    - name: DEBUG
+      shell: bash
+      run: |
+        git rev-parse HEAD
+
     - name: Update Semantic Version
       id: semver
       uses: pagopa/github-actions-template/maven-semver@main
