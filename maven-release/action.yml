@@ -45,7 +45,6 @@ runs:
 
     - uses: actions/checkout@v3
       with:
-        ref: ${{ github.ref_name}}
         token: ${{ inputs.github_token }}
 
     - name: Update Semantic Version
