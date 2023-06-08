@@ -45,7 +45,6 @@ runs:
 
     - uses: actions/checkout@v3
       with:
-        ref: ${{ github.ref_name}}
         token: ${{ inputs.github_token }}
 
     - name: Update Semantic Version
@@ -73,6 +72,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
+        commit: ${{ github.ref_name }}
         tag: ${{ steps.semver.outputs.version }}
         name: Release ${{ steps.semver.outputs.version }}
         makeLatest: latest
