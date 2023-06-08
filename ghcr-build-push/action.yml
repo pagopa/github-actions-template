@@ -2,10 +2,6 @@ name: Build and Push
 description: "Build and push a docker image on GitHub Container Registry"
 
 inputs:
-  branch:
-    required: true
-    type: string
-    description: Branch to build
   tag:
     required: true
     type: string

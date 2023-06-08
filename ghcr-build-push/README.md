@@ -18,7 +18,6 @@ action https://github.com/users/OWNER/packages/container/REPOSITORY/settings
 - name: Buil and Push
   uses: pagopa/github-actions-template/ghcr-build-push@v1
   with:
-    branch: 'main'
     tag: '1.0.0'
     github_token: ${{ secrets.GITHUB_TOKEN }}
     build_args: 'key=value'
@@ -29,7 +28,6 @@ action https://github.com/users/OWNER/packages/container/REPOSITORY/settings
 
 | Param        | Description                                              | Required | Values   | Default |
 |--------------|----------------------------------------------------------|----------|----------|---------|
-| branch       | Branch where chekcout                                    | **true** | `string` |         |
 | tag          | The github tag of application to build and push          | **true** | `string` |         |
 | github_token | A GitHub token                                           | **true** | `string` |         |
 | build_args   | optional docker build arguments(with format 'key=value') | false    | `string` |         |

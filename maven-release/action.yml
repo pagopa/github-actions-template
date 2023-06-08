@@ -43,20 +43,9 @@ runs:
         echo "skip_ci: ${{ inputs.skip_ci}}"
       shell: bash
 
-    - name: Dump GitHub context
-      shell: bash
-      env:
-        GITHUB_CONTEXT: ${{ toJSON(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
     - uses: actions/checkout@v3
       with:
         token: ${{ inputs.github_token }}
-
-    - name: DEBUG
-      shell: bash
-      run: |
-        git rev-parse HEAD
 
     - name: Update Semantic Version
       id: semver
