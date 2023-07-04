@@ -1,0 +1,78 @@
+name: Make Release
+description: "Make a new release on GitHub"
+
+inputs:
+  github_token:
+    required: true
+    type: string
+    description: Github Token with Admin privileges
+  semver:
+    required: true
+    type: choice
+    description: Select the new Semantic Version
+    options:
+      - major
+      - minor
+      - patch
+      - buildNumber
+      - skip
+  skip_ci:
+    required: false
+    type: boolean
+    description: True you want skip the CI workflows on release commit
+    default: true
+
+outputs:
+  version:
+    description: "New Version"
+    value: ${{ steps.semver.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Input Log
+      run: |
+        echo "📝 Inputs"
+        echo "semver: ${{ inputs.semver}}" 
+        echo "skip_ci: ${{ inputs.skip_ci}}"
+      shell: bash
+
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ inputs.github_token }}
+
+    - name: Set Node.js 16
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.10.0
+
+    - name: Bump Version
+      if: ${{ inputs.semver != 'skip' }}
+      shell: bash
+      id: semver
+      run: |
+        npm version ${{ inputs.semver }} --no-git-tag-version
+        echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+    - name: Push New Version
+      if: ${{ inputs.semver != 'skip' }}
+      shell: bash
+      run: |
+        git add .
+        git config --global user.email "github-bot@pagopa.it"
+        git config --global user.name "pagopa-github-bot"
+        git commit -m "Bump to version ${{ steps.semver.outputs.version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
+        git push origin ${{ github.ref_name}}
+
+    - name: Create Release
+      if: ${{ inputs.semver != 'skip' }}
+      uses: ncipollo/release-action@v1.12.0
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      with:
+        commit: ${{ github.ref_name }}
+        tag: ${{ steps.semver.outputs.version }}
+        name: Release ${{ steps.semver.outputs.version }}
+        makeLatest: latest
+        generateReleaseNotes: true
+        prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
