@@ -55,13 +55,20 @@ runs:
         fi
       shell: bash
 
+    - name: Set branch
+      run: |
+        echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
+      if: ${{ github.ref_name != 'main' }}
+      shell: bash
+
     - name: Bump Package Version
       id: bump
       if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver: ${{ inputs.semver  }}
-        current_version: ${{ steps.get_version.outputs.version }}
+        current_version: ${{ steps.get_version.outputs.version }}${{ env.BRANCH }}
+
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
