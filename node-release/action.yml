@@ -55,26 +55,25 @@ runs:
         fi
       shell: bash
 
-    - name: Set branch
-      run: |
-        echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
-      if: ${{ github.ref_name != 'main' }}
-      shell: bash
-
     - name: Bump Package Version
       id: bump
       if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver: ${{ inputs.semver  }}
-        current_version: ${{ steps.get_version.outputs.version }}${{ env.BRANCH }}
+        current_version: ${{ steps.get_version.outputs.version }}
 
+    - name: Set branch
+      run: |
+        echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
+      if: ${{ github.ref_name != 'main' }}
+      shell: bash
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        contents="$(jq '.version = "${{ steps.bump.outputs.new_version }}"' package.json)"
+        contents="$(jq '.version = "${{ steps.bump.outputs.new_version }}${{env.BRANCH}}"' package.json)"
         echo -E "${contents}" > package.json
   
         git add .
