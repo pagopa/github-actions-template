@@ -46,18 +46,30 @@ runs:
       with:
         node-version: 16.10.0
 
-    - name: Bump Version
-      if: ${{ inputs.semver != 'skip' }}
-      shell: bash
-      id: semver
+    - id: get_version
+      name: Get Version
       run: |
-        npm version ${{ inputs.semver }} --no-git-tag-version
-        echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        PACKAGE_FILE="package.json"
+        if [[ -f "$PACKAGE_FILE" ]]; then
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    - name: Bump Package Version
+      id: semver
+      if: ${{ inputs.semver != 'skip' }}
+      uses: pagopa/github-actions-template/bump-semver@main
+      with:
+        semver: ${{ inputs.semver  }}
+        current_version: ${{ steps.get_version.outputs.version }}
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
+        contents="$(jq '.version = "${{ steps.semver.outputs.version }}"' package.json)"
+        echo -E "${contents}" > package.json
+  
         git add .
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
