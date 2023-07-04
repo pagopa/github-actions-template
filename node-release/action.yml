@@ -56,7 +56,7 @@ runs:
       shell: bash
 
     - name: Bump Package Version
-      id: semver
+      id: bump
       if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
@@ -67,13 +67,13 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        contents="$(jq '.version = "${{ steps.semver.outputs.version }}"' package.json)"
+        contents="$(jq '.version = "${{ steps.bump.outputs.new_version }}"' package.json)"
         echo -E "${contents}" > package.json
   
         git add .
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
-        git commit -m "Bump to version ${{ steps.semver.outputs.version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
+        git commit -m "Bump to version ${{ steps.bump.outputs.new_version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
@@ -83,8 +83,8 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
         commit: ${{ github.ref_name }}
-        tag: ${{ steps.semver.outputs.version }}
-        name: Release ${{ steps.semver.outputs.version }}
+        tag: ${{ steps.bump.outputs.new_version }}
+        name: Release ${{ steps.bump.outputs.new_version }}
         makeLatest: latest
         generateReleaseNotes: true
         prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
