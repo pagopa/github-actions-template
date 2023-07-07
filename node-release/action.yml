@@ -46,6 +46,12 @@ runs:
       with:
         node-version: 16.10.0
 
+    - name: Set branch
+      run: |
+        echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
+      if: ${{ github.ref_name != 'main' }}
+      shell: bash
+
     - id: get_version
       name: Get Version
       run: |
@@ -63,23 +69,26 @@ runs:
         semver: ${{ inputs.semver  }}
         current_version: ${{ steps.get_version.outputs.version }}
 
-    - name: Set branch
+    - id: semver
+      name: Sem Version
       run: |
-        echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
-      if: ${{ github.ref_name != 'main' }}
+        PACKAGE_FILE="package.json"
+        if [[ -f "$PACKAGE_FILE" ]]; then
+          echo "version=$(node -p "require('./package.json').version")${{env.BRANCH}}" >> $GITHUB_OUTPUT
+        fi
       shell: bash
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        contents="$(jq '.version = "${{ steps.bump.outputs.new_version }}${{env.BRANCH}}"' package.json)"
+        contents="$(jq '.version = "${{ steps.semver.outputs.version }}"' package.json)"
         echo -E "${contents}" > package.json
   
         git add .
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
-        git commit -m "Bump to version ${{ steps.bump.outputs.new_version }}${{env.BRANCH}} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
+        git commit -m "Bump to version ${{ steps.semver.outputs.version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
@@ -89,8 +98,8 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
         commit: ${{ github.ref_name }}
-        tag: ${{ steps.bump.outputs.new_version }}${{env.BRANCH}}
-        name: Release ${{ steps.bump.outputs.new_version }}${{env.BRANCH}}
+        tag: ${{ steps.semver.outputs.version }}
+        name: Release ${{ steps.semver.outputs.version }}
         makeLatest: latest
         generateReleaseNotes: true
         prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
