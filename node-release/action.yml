@@ -79,7 +79,7 @@ runs:
         git add .
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
-        git commit -m "Bump to version ${{ steps.bump.outputs.new_version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
+        git commit -m "Bump to version ${{ steps.bump.outputs.new_version }}${{env.BRANCH}} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
@@ -89,8 +89,8 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
         commit: ${{ github.ref_name }}
-        tag: ${{ steps.bump.outputs.new_version }}
-        name: Release ${{ steps.bump.outputs.new_version }}
+        tag: ${{ steps.bump.outputs.new_version }}${{env.BRANCH}}
+        name: Release ${{ steps.bump.outputs.new_version }}${{env.BRANCH}}
         makeLatest: latest
         generateReleaseNotes: true
         prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
