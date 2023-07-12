@@ -25,7 +25,7 @@ inputs:
 outputs:
   version:
     description: "New Version"
-    value: ${{ steps.semver.outputs.version }}
+    value: ${{ steps.semver.outputs.new_version }}
 
 runs:
   using: "composite"
@@ -57,7 +57,7 @@ runs:
       run: |
         PACKAGE_FILE="package.json"
         if [[ -f "$PACKAGE_FILE" ]]; then
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
         fi
       shell: bash
 
@@ -67,18 +67,16 @@ runs:
       uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver: ${{ inputs.semver  }}
-        current_version: ${{ steps.get_version.outputs.version }}
+        current_version: ${{ env.version }}
 
     - id: semver
-      name: Sem Version
-      run: |
-        PACKAGE_FILE="package.json"
-        if [[ -f "$PACKAGE_FILE" ]]; then
-          echo "version=$(node -p "require('./package.json').version")${{env.BRANCH}}" >> $GITHUB_OUTPUT
-        fi
+      name: New Version
+      run: |       
+        echo "new_version=${{ steps.bump.outputs.new_version}}${{env.BRANCH}}" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Push New Version
+    - id: semver
+      name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
@@ -88,7 +86,7 @@ runs:
         git add .
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
-        git commit -m "Bump to version ${{ steps.semver.outputs.version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
+        git commit -m "Bump to version ${{ steps.semver.outputs.new_version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
@@ -98,8 +96,8 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
         commit: ${{ github.ref_name }}
-        tag: ${{ steps.semver.outputs.version }}
-        name: Release ${{ steps.semver.outputs.version }}
+        tag: ${{ steps.semver.outputs.new_version }}
+        name: Release ${{ steps.semver.outputs.new_version }}
         makeLatest: latest
         generateReleaseNotes: true
         prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
