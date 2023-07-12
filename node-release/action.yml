@@ -75,8 +75,7 @@ runs:
         echo "new_version=${{ steps.bump.outputs.new_version}}${{env.BRANCH}}" >> $GITHUB_OUTPUT
       shell: bash
 
-    - id: semver
-      name: Push New Version
+    - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
