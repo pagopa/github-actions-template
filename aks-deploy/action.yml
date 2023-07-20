@@ -29,7 +29,7 @@ inputs:
   helm_values_file:
     description: The values file to use
     type: string
-    default: ./helm/values-${{ inputs.env }}.yaml
+    default: ''
   namespace:
     required: true
     description: The namespace on AKS
@@ -85,9 +85,13 @@ runs:
       shell: bash
       run: |
         echo "🚀 Launch helm deploy"
-
+        if [[ "${{ inputs.helm_values_file }}" != '' ]]; then
+          VALUES_FILE=${{ inputs.helm_values_file }}
+        else 
+          VALUES_FILE=./helm/values-${{ inputs.env }}.yaml
+        fi
         helm upgrade --namespace ${{ inputs.namespace }} \
-          --install --values ${{ inputs.helm_values_file }} \
+          --install --values $VALUES_FILE \
           ${{inputs.helm_upgrade_options}} \
           --wait --timeout 5m0s \
           ${{ inputs.app_name }} ./helm
