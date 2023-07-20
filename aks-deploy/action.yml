@@ -26,6 +26,10 @@ inputs:
       - dev
       - uat
       - prod
+  helm_values_file:
+    description: The values file to use
+    type: string
+    default: ./helm/values-${{ inputs.env }}.yaml
   namespace:
     required: true
     description: The namespace on AKS
@@ -83,7 +87,7 @@ runs:
         echo "🚀 Launch helm deploy"
 
         helm upgrade --namespace ${{ inputs.namespace }} \
-          --install --values ./helm/values-${{ inputs.env }}.yaml \
+          --install --values ${{ inputs.helm_values_file }} \
           ${{inputs.helm_upgrade_options}} \
           --wait --timeout 5m0s \
           ${{ inputs.app_name }} ./helm
