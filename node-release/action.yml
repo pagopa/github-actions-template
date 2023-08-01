@@ -79,7 +79,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        contents="$(jq '.version = "${{ steps.semver.outputs.version }}"' package.json)"
+        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' package.json)"
         echo -E "${contents}" > package.json
   
         git add .

@@ -31,10 +31,16 @@ runs:
           var { CURRENT_VERSION, SEMVER } = process.env
           var versions = CURRENT_VERSION.replace('v','').split('.');
           
-          var major = parseInt(versions[0] ?? '0');
-          var minor = parseInt(versions[1] ?? '0');
-          var patch = parseInt((versions[2] ?? '0').split('-')[0] ?? '0');
-          var buildNumber = parseInt((versions[2] ?? '0').split('-')[1] ?? '0') || 0;
+          var v0 = versions[0] ?? '0';
+          var v1 = versions[1] ?? '0';
+          var vaux = (versions[2] ?? '0');
+          var v2 = vaux.split('-')[0] ?? '0';
+          var v3 = vaux.split('-')[1] ?? '0';
+          
+          var major = parseInt(v0) || 0;
+          var minor = parseInt(v1) || 0;
+          var patch = parseInt(v2) || 0;
+          var buildNumber = parseInt(v3) || 0;
 
           var newVersion = "";
 
