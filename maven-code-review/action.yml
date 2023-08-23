@@ -24,16 +24,21 @@ inputs:
     type: string
     description: Files to exclude from code duplication
     default: '**/model/**,**/entity/*'
+  java_version:
+    required: false
+    type: string
+    description: Version on JDK
+    default: '11'
 
 runs:
   using: "composite"
   steps:
   - uses: actions/checkout@v2
 
-  - name: Set up JDK 11
+  - name: Set up JDK
     uses: actions/setup-java@v1
     with:
-      java-version: 11
+      java-version: ${{ java_version }}
 
   - name: Set up Maven
     uses: stCarolas/setup-maven@v4.5
