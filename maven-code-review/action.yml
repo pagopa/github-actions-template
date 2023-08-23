@@ -40,17 +40,20 @@ runs:
   steps:
   - uses: actions/checkout@v2
 
-  - name: Set up JDK
+  - name: Set up GraalVM JDK
+    if: ${{ inputs.java_distribution == 'graalvm' }}
     uses: graalvm/setup-graalvm@v1
     with:
-      java-version: '17.0.7'
-      distribution: 'graalvm'
+      java-version: ${{ inputs.java_version }}
+      distribution: ${{ inputs.java_distribution }}
+      github-token: ${{ inputs.github_token }}
 
-#  - name: Set up JDK
-#    uses: actions/setup-java@v3
-#    with:
-#      distribution: ${{ inputs.java_distribution }}
-#      java-version: ${{ inputs.java_version }}
+  - name: Set up JDK
+    if: ${{ inputs.java_distribution != 'graalvm' }}
+    uses: actions/setup-java@v3
+    with:
+      distribution: ${{ inputs.java_distribution }}
+      java-version: ${{ inputs.java_version }}
 
   - name: Set up Maven
     uses: stCarolas/setup-maven@v4.5
