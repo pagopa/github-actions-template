@@ -24,6 +24,11 @@ inputs:
     type: string
     description: Files to exclude from code duplication
     default: '**/model/**,**/entity/*'
+  java_distribution:
+    required: false
+    type: string
+    description: Distribution of JDK
+    default: 'zulu'
   java_version:
     required: false
     type: string
@@ -38,6 +43,7 @@ runs:
   - name: Set up JDK
     uses: actions/setup-java@v3
     with:
+      distribution: ${{ inputs.java_distribution }}
       java-version: ${{ inputs.java_version }}
 
   - name: Set up Maven
