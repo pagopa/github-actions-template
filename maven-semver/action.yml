@@ -131,7 +131,7 @@ runs:
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
           yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
-          yq -i ".microservice-chart.create = false" "$i"
+          yq -i ".microservice-chart.canaryDelivery.create = false" "$i"
           git add "$i"
         done
 
@@ -148,7 +148,7 @@ runs:
         fi
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".microservice-chart.create = true" "$i"
+          yq -i ".microservice-chart.canaryDelivery.create = true" "$i"
           yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           git add "$i"
         done
