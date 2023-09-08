@@ -131,10 +131,12 @@ runs:
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
           yq -i ".microservice-chart.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".microservice-chart.create = false" "$i"
           git add "$i"
         done
 
     - name: Update Canary Version Helm
+      if: ${{ (inputs.beta == 'true') }}
       shell: bash
       run: |
         echo "🐤 Bump Canary Version to ${{ steps.get_app_version.outputs.version }}"
@@ -146,6 +148,7 @@ runs:
         fi
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
+          yq -i ".microservice-chart.create = true" "$i"
           yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
           git add "$i"
         done
