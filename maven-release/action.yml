@@ -22,9 +22,10 @@ inputs:
     description: True you want skip the CI workflows on release commit
     default: true
   beta:
-    required: true
+    required: false
     type: boolean
     description: True if it is a beta version (update canary helm version)
+    default: false
 
 
 outputs:
