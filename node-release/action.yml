@@ -16,6 +16,10 @@ inputs:
       - patch
       - buildNumber
       - skip
+  beta:
+    required: true
+    type: boolean
+    description: True if it is a beta version (update canary helm version)
   skip_ci:
     required: false
     type: boolean
@@ -87,6 +91,13 @@ runs:
         git config --global user.name "pagopa-github-bot"
         git commit -m "Bump to version ${{ steps.semver.outputs.new_version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
+
+    - name: Helm Bump
+      if: ${{ inputs.semver != 'skip' }}
+      uses: pagopa/github-actions-template/helm-bump@main
+      with:
+        version: ${{ steps.semver.outputs.new_version }}
+        beta: ${{ inputs.beta }}
 
     - name: Create Release
       if: ${{ inputs.semver != 'skip' }}
