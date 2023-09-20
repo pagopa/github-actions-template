@@ -14,60 +14,77 @@ runs:
   steps:
     - name: Pull request rejected
       if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged != true
+      shell: bash
       run: |
         echo "❌ PR was closed without a merge"
         exit 1
 
     # Set Semver
-    - run: echo "SEMVER=patch" >> $GITHUB_ENV
+    - name: Set semver
+      shell: bash
+      run: echo "SEMVER=patch" >> $GITHUB_ENV
 
     - name: Pull request rejected
       if: ${{ github.event.pull_request.merged && ( github.event.inputs.environment == 'uat' || github.event.inputs.environment == 'prod') && ( contains(github.event.pull_request.labels.*.name, 'breaking-change') || contains(github.event.pull_request.labels.*.name, 'new-release') || contains(github.event.pull_request.labels.*.name, 'ignore-for-release') ) }}
+      shell: bash
       run: |
         echo "❌ UAT and PROD accept only \"patch\" or \"promote\""
         exit 1
 
     - if: ${{ github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'ignore-for-release') }}
+      shell: bash
       run: echo "SEMVER=skip" >> $GITHUB_ENV
 
     - if: ${{ (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'new-release')) }}
+      shell: bash
       run: echo "SEMVER=minor" >> $GITHUB_ENV
 
     - if: ${{ (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'breaking-change')) }}
+      shell: bash
       run: echo "SEMVER=major" >> $GITHUB_ENV
 
     # force semver if dev, !=main or skip release
     - if: ${{ inputs.semver == 'new_release' }}
+      shell: bash
       run: echo "SEMVER=minor" >> $GITHUB_ENV
 
     - if: ${{ inputs.semver == 'breaking_change' }}
+      shell: bash
       run: echo "SEMVER=major" >> $GITHUB_ENV
 
     - if: ${{ github.ref_name != 'main' && inputs.semver == '' }}
+      shell: bash
       run: echo "SEMVER=buildNumber" >> $GITHUB_ENV
 
     - if: ${{ inputs.semver == 'promote' || inputs.semver == 'skip' }}
+      shell: bash
       run: echo "SEMVER=skip" >> $GITHUB_ENV
 
     - id: get_semver
       name: Set Output
+      shell: bash
       run: echo "semver=${{env.SEMVER}}" >> $GITHUB_OUTPUT
 
     # Set Environment
     - if: ${{ github.event.inputs.environment == null || github.event.inputs.environment == 'dev' }}
+      shell: bash
       run: echo "ENVIRONMENT=dev" >> $GITHUB_ENV
 
     - if: ${{ github.event.inputs.environment == 'uat' }}
+      shell: bash
       run: echo "ENVIRONMENT=uat" >> $GITHUB_ENV
 
     - if: ${{ github.event.inputs.environment == 'prod' }}
+      shell: bash
       run: echo "ENVIRONMENT=prod" >> $GITHUB_ENV
 
     - if: ${{ github.event.inputs.environment == 'all' }}
+      shell: bash
       run: echo "ENVIRONMENT=all" >> $GITHUB_ENV
 
     - id: output
       name: Set Output
+      shell: bash
       run: echo "environment=${{env.ENVIRONMENT}}" >> $GITHUB_OUTPUT
 
 
