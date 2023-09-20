@@ -1,6 +1,12 @@
 name: Semantic version Setup for Node components
 description: "Setting up semantic version according to issue label"
 
+
+inputs:
+  semver:
+    required: true
+    description: The name of the image from container registry to be used
+    type: string
 outputs:
   semver:
     description: "Semantic Version"
