@@ -18,10 +18,6 @@ inputs:
     required: true
     description: Azure Tenant ID
     type: string
-  resource_group:
-    required: true
-    description: The resource group of the function to deploy
-    type: string
   app_name:
     required: true
     description: The name of the function to deploy
