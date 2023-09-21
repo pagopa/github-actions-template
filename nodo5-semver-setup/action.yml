@@ -93,4 +93,7 @@ runs:
       shell: bash
       run: echo "environment=${{env.ENVIRONMENT}}" >> $GITHUB_OUTPUT
 
+    - shell: bash
+      run: echo "environment=${{env.ENVIRONMENT}}, semver=${{env.SEMVER}}"
+
 
