@@ -79,6 +79,14 @@ runs:
         echo "new_version=${{ steps.bump.outputs.new_version}}${{env.BRANCH}}" >> $GITHUB_OUTPUT
       shell: bash
 
+
+    - name: Helm Bump
+      if: ${{ inputs.semver != 'skip' }}
+      uses: pagopa/github-actions-template/helm-bump@helm-release
+      with:
+        version: ${{ steps.semver.outputs.new_version }}
+        beta: ${{ inputs.beta }}
+
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
@@ -91,13 +99,6 @@ runs:
         git config --global user.name "pagopa-github-bot"
         git commit -m "Bump to version ${{ steps.semver.outputs.new_version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
         git push origin ${{ github.ref_name}}
-
-    - name: Helm Bump
-      if: ${{ inputs.semver != 'skip' }}
-      uses: pagopa/github-actions-template/helm-bump@helm-release
-      with:
-        version: ${{ steps.semver.outputs.new_version }}
-        beta: ${{ inputs.beta }}
 
     - name: Create Release
       if: ${{ inputs.semver != 'skip' }}
