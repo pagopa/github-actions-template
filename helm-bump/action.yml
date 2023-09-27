@@ -50,7 +50,7 @@ runs:
 
     - name: Update Stable Version Helm
       shell: bash
-      if: ${{ !inputs.beta }}
+      if: ${{ inputs.beta != 'true' }}
       run: |
         echo "🚀 Bump Stable Version to ${{ inputs.version }}"
         
@@ -68,7 +68,7 @@ runs:
 
     - name: Update Canary Version Helm
       shell: bash
-      if: ${{ inputs.beta }}
+      if: ${{ inputs.beta == 'true' }}
       run: |
         echo "🐤 Bump Canary Version to ${{ inputs.version }}"
         
