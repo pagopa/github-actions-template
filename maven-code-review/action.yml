@@ -24,16 +24,36 @@ inputs:
     type: string
     description: Files to exclude from code duplication
     default: '**/model/**,**/entity/*'
+  java_distribution:
+    required: false
+    type: string
+    description: Distribution of JDK
+    default: 'zulu'
+  java_version:
+    required: false
+    type: string
+    description: Version on JDK
+    default: '11'
 
 runs:
   using: "composite"
   steps:
   - uses: actions/checkout@v2
 
-  - name: Set up JDK 11
-    uses: actions/setup-java@v1
+  - name: Set up GraalVM JDK
+    if: ${{ inputs.java_distribution == 'graalvm' }}
+    uses: graalvm/setup-graalvm@v1
     with:
-      java-version: 11
+      java-version: ${{ inputs.java_version }}
+      distribution: ${{ inputs.java_distribution }}
+      github-token: ${{ inputs.github_token }}
+
+  - name: Set up JDK
+    if: ${{ inputs.java_distribution != 'graalvm' }}
+    uses: actions/setup-java@v3
+    with:
+      distribution: ${{ inputs.java_distribution }}
+      java-version: ${{ inputs.java_version }}
 
   - name: Set up Maven
     uses: stCarolas/setup-maven@v4.5
