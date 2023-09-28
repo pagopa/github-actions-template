@@ -82,7 +82,7 @@ runs:
 
     - name: Helm Bump
       if: ${{ inputs.semver != 'skip' }}
-      uses: pagopa/github-actions-template/helm-bump@helm-release
+      uses: pagopa/github-actions-template/helm-bump@main
       with:
         version: ${{ steps.semver.outputs.new_version }}
         beta: ${{ inputs.beta }}
