@@ -31,6 +31,7 @@ The new version is saved in the output.
 | Param        | Description                                               | Required | Values                                           | Default |
 |--------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
 | semver       | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| beta         | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
 | github_token | A GitHub token                                            | **true** | `string`                                         |         |
 | skip_ci      | True if you want skip CI workflows on commit release      | false    | `boolean`                                        | true    |  
 
