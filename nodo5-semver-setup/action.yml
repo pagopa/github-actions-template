@@ -23,6 +23,7 @@ runs:
 
     - name: Branch or tag selection
       id: is_git_tag
+      shell: bash
       run: |
         if git tag --list "${{ github.ref_name }}" >/dev/null; then
           echo "IS_GIT_TAG=1" >> $GITHUB_ENV
@@ -32,39 +33,48 @@ runs:
 
     # Set Environment
     - if: ${{ github.event.inputs.environment == null || github.event.inputs.environment == 'dev' }}
+      shell: bash
       run: echo "ENVIRONMENT=dev" >> $GITHUB_ENV
 
     - if: ${{ github.event.inputs.environment == 'uat' }}
+      shell: bash
       run: echo "ENVIRONMENT=uat" >> $GITHUB_ENV
 
     - if: ${{ github.event.inputs.environment == 'prod' }}
+      shell: bash
       run: echo "ENVIRONMENT=prod" >> $GITHUB_ENV
 
     - if: ${{ github.event.inputs.environment == 'all' }}
+      shell: bash
       run: echo "ENVIRONMENT=all" >> $GITHUB_ENV
 
     # Check PR
     - name: pull request rejected
       if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged != true
+      shell: bash
       run: |
         echo "❌ PR was closed without a merge"
         exit 1
 
     # Set Semver
     - run: echo "SEMVER=patch" >> $GITHUB_ENV
+      shell: bash
 
     ## The following checks analyze PR workflow
 
     # this is to avoid breaking-change or new-release in uat and prod env
     - if: ${{ github.event.pull_request.merged && ( github.event.inputs.environment == 'uat' || github.event.inputs.environment == 'prod') && ( contains(github.event.pull_request.labels.*.name, 'breaking-change') || contains(github.event.pull_request.labels.*.name, 'new-release') || contains(github.event.pull_request.labels.*.name, 'ignore-for-release') ) }}
+      shell: bash
       run: |
         echo "❌ UAT and PROD accept only \"patch\" or \"promote\""
         exit 1
 
     - if: ${{ github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'ignore-for-release') }}
+      shell: bash
       run: echo "SEMVER=skip" >> $GITHUB_ENV
 
     - if: ${{ github.event.pull_request.merged && ( contains(github.event.pull_request.labels.*.name, 'new-release') || contains(github.event.pull_request.labels.*.name, 'breaking-change') ) }}
+      shell: bash
       run: |
         echo "❌ Only \"patch\" or \"ignore-for-release\" are accepted."
         echo "ℹ️ \"breaking-change\" and \"new-release\" must be executed only in DEV env."
@@ -74,18 +84,22 @@ runs:
 
     # force semver if dev, !=main or skip release
     - if: ${{ (inputs.semver == 'new_release' || inputs.semver == 'breaking_change') && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
+      shell: bash
       run: |
         echo "❌ UAT and PROD accept only \"patch\" or \"promote\""
         exit 1
 
     - if: ${{ inputs.semver == 'new_release'}}
+      shell: bash
       run: echo "SEMVER=minor" >> $GITHUB_ENV
 
     - if: ${{ inputs.semver == 'breaking_change' }}
+      shell: bash
       run: echo "SEMVER=major" >> $GITHUB_ENV
 
     # build-number if in dev env and deploy from specific branch
     - if: ${{ github.ref_name != 'main' && env.ENVIRONMENT == 'dev'}}
+      shell: bash
       run: |
         if $semver == 'new_release' || $semver == 'breaking_change'
         then
@@ -97,26 +111,32 @@ runs:
 
     # patch if in uat|prod env and deploy from specific branch
     - if: ${{ github.ref_name != 'main' && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
+      shell: bash
       run: echo "SEMVER=patch" >> $GITHUB_ENV
 
     # override previous SEMVER if in uat|prod env and deploy from specific tag
     - if: ${{ env.IS_GIT_TAG && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
+      shell: bash
       run: echo "SEMVER=skip" >> $GITHUB_ENV
 
     - if: ${{ github.ref_name == 'main' && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
+      shell: bash
       run: |
         echo "❌ UAT and PROD accept only \"patch\" or \"promote\" from specific TAG, custom branch (for bugfixing) but MAIN branch is not accepted"
         exit 1
 
     - if: ${{ inputs.semver == 'promote' || inputs.semver == 'skip' }}
+      shell: bash
       run: echo "SEMVER=skip" >> $GITHUB_ENV
 
     - id: get_semver
       name: Set Semver
+      shell: bash
       run: echo "semver=${{env.SEMVER}}" >> $GITHUB_OUTPUT
 
     - id: output
       name: Set Environment
+      shell: bash
       run: echo "environment=${{env.ENVIRONMENT}}" >> $GITHUB_OUTPUT
 
     - name: Show semver and environment values
