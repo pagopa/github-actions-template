@@ -18,6 +18,7 @@ This action makes a deployment on AKS of a docker image.
     resource_group: 'your-resource-group'
     app_name: 'myapp'
     helm_upgrade_options: ' --set microservice-chart.image.tag=v1.0.0'
+    timeout: '5m0s'
 ```
 
 ## Input
@@ -34,6 +35,7 @@ This action makes a deployment on AKS of a docker image.
 | resource_group       | The resource group of the cluster                       | **true** | `string`             |         |
 | app_name             | The name of the application                             | **true** | `string`             |         |
 | helm_upgrade_options | Additional options you can pass to helm upgrade command | false    | `string`             |         |
+| timeout              | to set the timeout for the helm upgrade command         | false    | `string`             | `5m0s`  |
 
 ## Output
 
