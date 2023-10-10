@@ -47,6 +47,11 @@ inputs:
     description: options you can pass to helm upgrade command
     type: string
     default: ''
+  timeout:
+    required: false
+    description: to set the timeout for the helm upgrade command
+    type: string
+    default: '5m0s'
 
 runs:
   using: "composite"
@@ -85,7 +90,7 @@ runs:
         helm upgrade --namespace ${{ inputs.namespace }} \
           --install --values ./helm/values-${{ inputs.env }}.yaml \
           ${{inputs.helm_upgrade_options}} \
-          --wait --timeout 5m0s \
+          --wait --timeout ${{timeout}} \
           ${{ inputs.app_name }} ./helm
         
         echo "✅ Helm deployed"
