@@ -1,0 +1,88 @@
+name: Helm Bump
+description: "Bump Helm Chart and Values"
+
+inputs:
+  version:
+    required: true
+    type: string
+    description: The new version
+  beta:
+    required: true
+    type: boolean
+    description: True if it is a beta version (update canary helm version)
+
+runs:
+  using: "composite"
+  steps:
+    - name: Input Log
+      run: |
+        echo "📝 Inputs"
+        echo "version: ${{ inputs.version}}" 
+        echo "beta: ${{ inputs.beta}}"
+      shell: bash
+
+    - id: get_chart_version
+      name: Get Version
+      run: |
+        CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          echo "chart_version=$(yq -r ".version" "$CHART_FILE")" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Bump Chart Version
+      id: bump_chart_version
+      uses: pagopa/github-actions-template/bump-semver@main
+      with:
+        semver: ${{ (inputs.beta == 'true' && 'patch') || 'minor' }}
+        current_version: ${{ env.chart_version }}
+
+    - name: Update Chart Version
+      shell: bash
+      run: |
+        echo "📑 Bump Chart Version to ${{ steps.bump_chart_version.outputs.new_version }}"
+        
+        CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          yq -i ".version = \"${{ steps.bump_chart_version.outputs.new_version }}\"" "$CHART_FILE"
+          git add "$CHART_FILE"
+        fi
+
+    - name: Update Stable Version Helm
+      shell: bash
+      if: ${{ inputs.beta != 'true' }}
+      run: |
+        echo "🚀 Bump Stable Version to ${{ inputs.version }}"
+        
+        CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          yq -i ".appVersion = \"${{ inputs.version }}\"" "$CHART_FILE"
+          git add "$CHART_FILE"
+        fi
+        for i in helm/values-*.yaml; do
+          [ -f "$i" ] || break
+          yq -i ".microservice-chart.image.tag = \"${{ inputs.version }}\"" "$i"
+          yq -i ".microservice-chart.canaryDelivery.create = false" "$i"
+          git add "$i"
+        done
+
+    - name: Update Canary Version Helm
+      shell: bash
+      if: ${{ inputs.beta == 'true' }}
+      run: |
+        echo "🐤 Bump Canary Version to ${{ inputs.version }}"
+        
+        CHART_FILE="helm/Chart.yaml"
+        if [[ -f "$CHART_FILE" ]]; then
+          yq -i ".appVersion = \"${{ inputs.version }}\"" "$CHART_FILE"
+          git add "$CHART_FILE"
+        fi
+        for i in helm/values-*.yaml; do
+          [ -f "$i" ] || break
+          yq -i ".microservice-chart.canaryDelivery.create = true" "$i"
+          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ inputs.version }}\"" "$i"
+          git add "$i"
+        done
+
+   
+

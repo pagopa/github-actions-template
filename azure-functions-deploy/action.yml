@@ -1,0 +1,49 @@
+name: Deploy container as Azure Functions
+description: "Deploy container functionApp on Azure"
+
+inputs:
+  branch:
+    required: true
+    description: The branch to deploy
+    type: string
+  client_id:
+    required: true
+    description: Azure Client ID
+    type: string
+  subscription_id:
+    required: true
+    description: Azure Subscription ID
+    type: string
+  tenant_id:
+    required: true
+    description: Azure Tenant ID
+    type: string
+  app_name:
+    required: true
+    description: The name of the function to deploy
+    type: string
+  registry_image:
+    required: true
+    description: The name of the image from container registry to be used
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+      with:
+        ref: ${{ inputs.branch}}
+
+    - name: Login via Azure CLI
+      uses: azure/login@89d153571fe9a34ed70fcf9f1d95ab8debea7a73
+      with:
+        client-id: ${{ inputs.client_id }}
+        tenant-id: ${{ inputs.tenant_id }}
+        subscription-id: ${{ inputs.subscription_id }}
+
+    - name: 'Run Azure Functions Container Action'
+      uses: Azure/functions-container-action@0aec6197033a72d3ca813f1aebd9391f639c2a8f
+      with:
+        app-name: ${{ inputs.app_name }}
+        image: ${{ inputs.registry_image }}
+        slot-name: production
