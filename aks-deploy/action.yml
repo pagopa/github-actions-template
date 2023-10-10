@@ -90,7 +90,7 @@ runs:
         helm upgrade --namespace ${{ inputs.namespace }} \
           --install --values ./helm/values-${{ inputs.env }}.yaml \
           ${{inputs.helm_upgrade_options}} \
-          --wait --timeout ${{timeout}} \
+          --wait --timeout ${{inputs.timeout}} \
           ${{ inputs.app_name }} ./helm
         
         echo "✅ Helm deployed"
