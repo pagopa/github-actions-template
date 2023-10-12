@@ -54,7 +54,7 @@ on:
   steps:  
     - name: Semver setup
       id: semver_setup
-      uses: pagopa/github-actions-template/node-semver-setup@v1
+      uses: pagopa/github-actions-template/nodo5-semver-setup@v1
 
     - run: |
         echo "${{ steps.get_semver.outputs.semver }}"
