@@ -42,6 +42,7 @@ runs:
         echo "📝 Inputs"
         echo "semver: ${{ inputs.semver}}" 
         echo "beta: ${{ inputs.beta}}"
+        echo "jdk version: ${{ inputs.jdk_version}}"
       shell: bash
 
     - name: Set up JDK ${{ inputs.jdk_version}}
