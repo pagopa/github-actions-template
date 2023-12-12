@@ -50,6 +50,7 @@ runs:
         echo "semver: ${{ inputs.semver}}" 
         echo "beta: ${{ inputs.beta}}"
         echo "skip_ci: ${{ inputs.skip_ci}}"
+        echo "jdk version: ${{ inputs.jdk_version}}"
       shell: bash
 
     - uses: actions/checkout@v3
@@ -58,7 +59,7 @@ runs:
 
     - name: Update Semantic Version
       id: semver
-      uses: pagopa/github-actions-template/maven-semver@PAGOPA-1360-gpd-upload-service
+      uses: pagopa/github-actions-template/maven-semver@@main
       with:
         semver: ${{inputs.semver}}
         beta: ${{inputs.beta}}
