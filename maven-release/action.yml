@@ -26,6 +26,14 @@ inputs:
     type: boolean
     description: True if it is a beta version (update canary helm version)
     default: false
+  jdk_version:
+    required: false
+    type: choice
+    description: Select the JDK version
+    default: 11
+    options:
+      - 11
+      - 17
 
 
 outputs:
@@ -42,6 +50,7 @@ runs:
         echo "semver: ${{ inputs.semver}}" 
         echo "beta: ${{ inputs.beta}}"
         echo "skip_ci: ${{ inputs.skip_ci}}"
+        echo "jdk version: ${{ inputs.jdk_version}}"
       shell: bash
 
     - uses: actions/checkout@v3
@@ -54,6 +63,7 @@ runs:
       with:
         semver: ${{inputs.semver}}
         beta: ${{inputs.beta}}
+        jdk_version: ${{inputs.jdk_version}}
 
 
     - name: Push New Version

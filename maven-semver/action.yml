@@ -16,6 +16,14 @@ inputs:
     required: true
     type: boolean
     description: True if it is a beta version (update canary helm version)
+  jdk_version:
+    required: false
+    type: choice
+    description: Select the JDK version
+    default: 11
+    options:
+      - 11
+      - 17
 
 
 outputs:
@@ -34,12 +42,13 @@ runs:
         echo "📝 Inputs"
         echo "semver: ${{ inputs.semver}}" 
         echo "beta: ${{ inputs.beta}}"
+        echo "jdk version: ${{ inputs.jdk_version}}"
       shell: bash
 
-    - name: Set up JDK 11
+    - name: Set up JDK ${{ inputs.jdk_version}}
       uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: ${{ inputs.jdk_version}}
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4.5
       with:

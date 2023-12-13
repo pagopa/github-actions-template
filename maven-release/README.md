@@ -23,6 +23,7 @@ The new version is saved in the output.
     github_token: ${{ secrets.GITHUB_TOKEN }}
     skip_ci: true
     beta: false
+    jdk_version: 11
       
 - run: echo "${{ steps.release.outputs.version }}"
 ```
@@ -35,6 +36,7 @@ The new version is saved in the output.
 | github_token | A GitHub token                                            | **true** | `string`                                         |         |
 | beta         | True if it is a beta version (update canary helm version) | false    | `boolean`                                        | false   |
 | skip_ci      | True if you want skip CI workflows on commit release      | false    | `boolean`                                        | true    |  
+| jdk_version  | Select the JDK version                                    | false    | `11`, `17`                                       | `11`    |
 
 ## Output
 

@@ -21,6 +21,7 @@ The new version is saved in the output.
   with:
     semver: 'major'
     beta: false
+    jdk_version: 11
       
 - run: echo "${{ steps.semver.outputs.version }}"
 
@@ -29,10 +30,11 @@ The new version is saved in the output.
 
 ## Input
 
-| Param  | Description                                               | Required | Values                                           | Default |
-|--------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
-| semver | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
-| beta   | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
+| Param       | Description                                               | Required | Values                                           | Default |
+|-------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
+| semver      | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| beta        | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
+| jdk_version | Select the JDK version                                    | false    | `11`, `17`                                       | `11`    |
 
 ## Output
 
