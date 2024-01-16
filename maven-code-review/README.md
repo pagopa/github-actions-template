@@ -19,6 +19,8 @@ pom.xml to calculate the coverage.
     project_key: pagopa_project-key
     coverage_exclusions: "**/config/*,**/*Mock*,**/model/**,**/entity/*"
     cpd_exclusions: "**/model/**,**/entity/*"
+    java_distribution: 'zulu'
+    java_version: '11'
       
 ```
 
@@ -31,6 +33,9 @@ pom.xml to calculate the coverage.
 | sonar_token         | The Sonar token                        | **true** | `string` |                                                 |
 | coverage_exclusions | Files to exclude from coverage         | false    | `string` | "**/config/*,**/*Mock*,**/model/**,**/entity/*" |
 | cpd_exclusions      | Files to exclude from code duplication | false    | `string` | **/model/**,**/entity/*"                        |
+| java_distribution   | Distribution of JDK                    | false    | `string` | zulu                                            |
+| java_version        | Version of JDK                         | false    | `string` | 11                                              |
+
 
 ## Output
 
