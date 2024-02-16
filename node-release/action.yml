@@ -67,7 +67,6 @@ runs:
 
     - name: Bump Package Version
       id: bump
-      if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/bump-semver@main
       with:
         semver: ${{ inputs.semver  }}
