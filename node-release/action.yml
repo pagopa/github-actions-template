@@ -75,7 +75,8 @@ runs:
 
     - id: semver
       name: New Version
-      run: |       
+      run: |   
+        echo "${{ steps.bump.outputs}}"
         echo "new_version=${{ steps.bump.outputs.new_version}}${{env.BRANCH}}" >> $GITHUB_OUTPUT
       shell: bash
 
