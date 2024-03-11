@@ -14,6 +14,11 @@ inputs:
     required: true
     type: string
     description: Key of the project on SonarCloud
+  coverage_report_path:
+    required: false
+    type: string
+    description: Location of jacoco.xml
+    default: './target/site/jacoco/jacoco.xml'
   coverage_exclusions:
     required: false
     type: string
@@ -80,7 +85,7 @@ runs:
     run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       -Dsonar.organization=pagopa
       -Dsonar.projectKey=${{ env.PROJECT_KEY }}
-      -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+      -Dsonar.coverage.jacoco.xmlReportPaths=${{inputs.coverage_report_path}}
       -Dsonar.coverage.exclusions=${{inputs.coverage_exclusions}}
       -Dsonar.cpd.exclusions=${{inputs.cpd_exclusions}}
       -Dsonar.host.url=https://sonarcloud.io
@@ -103,7 +108,7 @@ runs:
     run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       -Dsonar.organization=pagopa
       -Dsonar.projectKey=${{ env.PROJECT_KEY }}
-      -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+      -Dsonar.coverage.jacoco.xmlReportPaths=${{inputs.coverage_report_path}}
       -Dsonar.coverage.exclusions=${{inputs.coverage_exclusions}}
       -Dsonar.cpd.exclusions=${{inputs.cpd_exclusions}}
       -Dsonar.branch.name=${{ github.head_ref }}
