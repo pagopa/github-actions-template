@@ -72,17 +72,17 @@ runs:
         arrIN=($(cat version.sbt))
         SBT_VERSION="${arrIN[1]}"
         IFS=' '
-        echo "CURRENT_VERSION=$SBT_VERSION" >> $GITHUB_ENV
+        
         IFS="-" read VERSION PRE_RELEASE <<< $SBT_VERSION; IFS="\n"
         IFS="." read MAJOR MINOR PATCH <<< $VERSION; IFS="\n"
         IFS="." read PRE_RELEASE_NAME PRE_RELEASE_VERSION <<< $PRE_RELEASE; IFS="\n"
-        
         echo "MAJOR=$MAJOR"
         echo "MINOR=$MINOR"
         echo "PATCH=$PATCH"
-        echo "MAJOR=$MAJOR" >> $GITHUB_ENV
-        echo "MINOR=$MINOR" >> $GITHUB_ENV
-        echo "PATCH=$PATCH" >> $GITHUB_ENV
+        echo "CURRENT_VERSION=$SBT_VERSION
+        MAJOR=$MAJOR
+        MINOR=$MINOR
+        PATCH=$PATCH" >> $GITHUB_ENV
       shell: bash
 
     - name: Set build-number
