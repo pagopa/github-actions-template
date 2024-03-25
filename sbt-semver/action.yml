@@ -68,8 +68,11 @@ runs:
 
     - name: Get current version
       run: |
-        IFS='"'
+        IFS='-'
         arrIN=($(cat version.sbt))
+        SIMPLE_VERSION="${arrIN[0]}"
+        IFS='"'
+        arrIN=($SIMPLE_VERSION)
         SBT_VERSION="${arrIN[1]}"
         IFS=' '
         
