@@ -72,10 +72,14 @@ runs:
         arrIN=($(cat version.sbt))
         SBT_VERSION="${arrIN[1]}"
         IFS=' '
-        echo "CURRENT_VERSION=-$SBT_VERSION" >> $GITHUB_ENV
+        echo "CURRENT_VERSION=$SBT_VERSION" >> $GITHUB_ENV
         IFS="-" read VERSION PRE_RELEASE <<< $SBT_VERSION; IFS="\n"
         IFS="." read MAJOR MINOR PATCH <<< $VERSION; IFS="\n"
         IFS="." read PRE_RELEASE_NAME PRE_RELEASE_VERSION <<< $PRE_RELEASE; IFS="\n"
+        
+        echo "MAJOR=$MAJOR"
+        echo "MINOR=$MINOR"
+        echo "PATCH=$PATCH"
         echo "MAJOR=$MAJOR" >> $GITHUB_ENV
         echo "MINOR=$MINOR" >> $GITHUB_ENV
         echo "PATCH=$PATCH" >> $GITHUB_ENV
@@ -83,25 +87,25 @@ runs:
 
     - name: Set build-number
       run: |
-        echo "ThisBuild / version := \"{{env.CURRENT_VERSION}}{{env.BRANCH}}\"" > version.sbt
+        echo "ThisBuild / version := \"${{env.CURRENT_VERSION}}${{env.BRANCH}}\"" > version.sbt
       if: ${{ inputs.semver == 'buildNumber' }}
       shell: bash
 
     - name: Set major
       run: |
-        echo "ThisBuild / version := \"$(({{env.MAJOR}})+1).0.0\"" > version.sbt
+        echo "ThisBuild / version := \"$((${{env.MAJOR}})+1).0.0\"" > version.sbt
       if: ${{ inputs.semver == 'major' }}
       shell: bash
 
     - name: Set minor
       run: |
-        echo "ThisBuild / version := \"{{env.MAJOR}}.$(({{env.MINOR}})+1).0\"" > version.sbt
+        echo "ThisBuild / version := \"${{env.MAJOR}}.$((${{env.MINOR}})+1).0\"" > version.sbt
       if: ${{ inputs.semver == 'minor' }}
       shell: bash
 
     - name: Set patch
       run: |
-        echo "ThisBuild / version := \"{{env.MAJOR}}.{{env.MINOR}}.$(({{env.PATCH}})+1)\"" > version.sbt
+        echo "ThisBuild / version := \"${{env.MAJOR}}.${{env.MINOR}}.$((${{env.PATCH}})+1)\"" > version.sbt
       if: ${{ inputs.semver == 'patch' }}
       shell: bash
 
