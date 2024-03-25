@@ -117,9 +117,8 @@ runs:
         arrIN=($(cat version.sbt))
         SBT_VERSION="${arrIN[1]}"
         IFS=' '
-        echo "CURRENT_VERSION=-$SBT_VERSION" >> $GITHUB_ENV
-        echo "🆙 Bump App Version to $CURRENT_VERSION"
-        echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "🆙 Bump App Version to $SBT_VERSION"
+        echo "version=$SBT_VERSION" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Helm Bump
