@@ -71,7 +71,7 @@ runs:
       shell: bash
       run: |
         echo "${{ steps.semver.outputs.version }}"
-        git ls-files . | grep 'pom.xml'  | xargs git add
+        git ls-files . | grep 'version.sbt'  | xargs git add
         git config --global user.email "github-bot@pagopa.it"
         git config --global user.name "pagopa-github-bot"
         git commit -m "Bump to version ${{ steps.semver.outputs.version }} ${{ (inputs.skip_ci && '[skip ci]') || '' }}" || exit 0
