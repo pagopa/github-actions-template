@@ -91,7 +91,7 @@ runs:
 
     - name: Set build-number
       run: |
-        echo "ThisBuild / version := \"${{env.CURRENT_VERSION}}${{env.BRANCH}}\"" > version.sbt
+        echo "ThisBuild / version := \"${{env.CURRENT_VERSION}}-${{github.run_number}}${{env.BRANCH}}\"" > version.sbt
       if: ${{ inputs.semver == 'buildNumber' }}
       shell: bash
 
