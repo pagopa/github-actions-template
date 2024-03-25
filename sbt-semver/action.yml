@@ -94,19 +94,19 @@ runs:
 
     - name: Set major
       run: |
-        echo "ThisBuild / version := \"$((${{env.MAJOR}})+1).0.0\"" > version.sbt
+        echo "ThisBuild / version := \"$((${{env.MAJOR}})+1).0.0${{env.BRANCH}}\"" > version.sbt
       if: ${{ inputs.semver == 'major' }}
       shell: bash
 
     - name: Set minor
       run: |
-        echo "ThisBuild / version := \"${{env.MAJOR}}.$((${{env.MINOR}})+1).0\"" > version.sbt
+        echo "ThisBuild / version := \"${{env.MAJOR}}.$((${{env.MINOR}})+1).0${{env.BRANCH}}\"" > version.sbt
       if: ${{ inputs.semver == 'minor' }}
       shell: bash
 
     - name: Set patch
       run: |
-        echo "ThisBuild / version := \"${{env.MAJOR}}.${{env.MINOR}}.$((${{env.PATCH}})+1)\"" > version.sbt
+        echo "ThisBuild / version := \"${{env.MAJOR}}.${{env.MINOR}}.$((${{env.PATCH}})+1)${{env.BRANCH}}\"" > version.sbt
       if: ${{ inputs.semver == 'patch' }}
       shell: bash
 
