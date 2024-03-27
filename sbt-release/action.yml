@@ -30,7 +30,7 @@ inputs:
     required: false
     type: choice
     description: Select the JDK version
-    default: 11
+    default: 17
     options:
       - 11
       - 17
