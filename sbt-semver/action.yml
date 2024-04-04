@@ -1,0 +1,157 @@
+name: Semver
+description: "Semantic Versioning"
+
+inputs:
+  semver:
+    required: true
+    type: choice
+    description: Select the new Semantic Version
+    options:
+      - major
+      - minor
+      - patch
+      - buildNumber
+      - skip
+  beta:
+    required: true
+    type: boolean
+    description: True if it is a beta version (update canary helm version)
+  jdk_version:
+    required: false
+    type: choice
+    description: Select the JDK version
+    default: 17
+    options:
+      - 11
+      - 17
+
+
+outputs:
+  version:
+    description: "New App Version"
+    value: ${{ steps.get_app_version.outputs.version }}
+  chart_version:
+    description: "New Chart Version"
+    value: ${{ steps.get_chart_version.outputs.chart_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Input Log
+      run: |
+        echo "📝 Inputs"
+        echo "semver: ${{ inputs.semver}}" 
+        echo "beta: ${{ inputs.beta}}"
+        echo "jdk version: ${{ inputs.jdk_version}}"
+      shell: bash
+
+    - name: Set up JDK ${{ inputs.jdk_version}}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ inputs.jdk_version}}
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@v4.5
+      with:
+        maven-version: 3.8.2
+    - name: Cache Maven packages
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Set branch
+      run: |
+        echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
+      if: ${{ github.ref_name != 'main' }}
+      shell: bash
+
+    - name: Get current version
+      run: |
+        IFS='-'
+        arrIN=($(cat version.sbt))
+        SIMPLE_VERSION="${arrIN[0]}"
+        IFS='"'
+        arrIN=($SIMPLE_VERSION)
+        SBT_VERSION="${arrIN[1]}"
+        IFS=' '
+        
+        IFS="-" read VERSION PRE_RELEASE <<< $SBT_VERSION; IFS="\n"
+        IFS="." read MAJOR MINOR PATCH <<< $VERSION; IFS="\n"
+        IFS="." read PRE_RELEASE_NAME PRE_RELEASE_VERSION <<< $PRE_RELEASE; IFS="\n"
+        
+        echo "MAJOR=$MAJOR"
+        echo "MINOR=$MINOR"
+        echo "PATCH=$PATCH"
+        echo "CURRENT_VERSION=$SBT_VERSION" >> "$GITHUB_ENV"
+        echo "MAJOR=$MAJOR" >> "$GITHUB_ENV"
+        echo "MINOR=$MINOR" >> "$GITHUB_ENV"
+        echo "PATCH=$PATCH" >> "$GITHUB_ENV"
+      shell: bash
+
+    - name: Set build-number
+      run: |
+        echo "ThisBuild / version := \"${{env.CURRENT_VERSION}}-${{github.run_number}}${{env.BRANCH}}\"" > version.sbt
+      if: ${{ inputs.semver == 'buildNumber' }}
+      shell: bash
+
+    - name: Set major
+      run: |
+        echo "ThisBuild / version := \"$((${{env.MAJOR}}+1)).0.0${{env.BRANCH}}\"" > version.sbt
+      if: ${{ inputs.semver == 'major' }}
+      shell: bash
+
+    - name: Set minor
+      run: |
+        echo "ThisBuild / version := \"${{env.MAJOR}}.$((${{env.MINOR}}+1)).0${{env.BRANCH}}\"" > version.sbt
+      if: ${{ inputs.semver == 'minor' }}
+      shell: bash
+
+    - name: Set patch
+      run: |
+        echo "ThisBuild / version := \"${{env.MAJOR}}.${{env.MINOR}}.$((${{env.PATCH}}+1))${{env.BRANCH}}\"" > version.sbt
+      if: ${{ inputs.semver == 'patch' }}
+      shell: bash
+
+    - id: get_app_version
+      name: Get Version
+      run: |
+        IFS='"'
+        arrIN=($(cat version.sbt))
+        SBT_VERSION="${arrIN[1]}"
+        IFS=' '
+        echo "🆙 Bump App Version to $SBT_VERSION"
+        echo "version=$SBT_VERSION" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Helm Bump
+      if: ${{ inputs.semver != 'skip' }}
+      uses: pagopa/github-actions-template/helm-bump@main
+      with:
+        version: ${{ steps.get_app_version.outputs.version }}
+        beta: ${{ inputs.beta }}
+
+
+    - name: Update Openapi/Swagger Version
+      if: ${{ inputs.semver != 'skip' }}
+      shell: bash
+      run: |
+        echo "📑 Bump Openapi Version to ${{ steps.get_app_version.outputs.version }}"
+
+        for i in openapi/*.json; do
+          [ -f "$i" ] || break
+          cat <<< "$(jq ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i")" > "$i"
+          git add $i
+        done
+        for i in openapi/*.yaml; do
+          [ -f "$i" ] || break
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          git add "$i"
+        done
+        for i in openapi/*.yml; do
+          [ -f "$i" ] || break
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          git add "$i"
+        done
+
+
