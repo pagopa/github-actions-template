@@ -25,12 +25,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       with:
         fetch-depth: 0
 
     - name: Check Size
-      uses: actions/github-script@v6.3.3
+      uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0 # v6.3.3
       env:
         IGNORED_FILES: ${{inputs.ignored_files}}
         MIN: ${{inputs.min_size}}
