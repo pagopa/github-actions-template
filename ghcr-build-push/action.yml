@@ -6,6 +6,16 @@ inputs:
     required: true
     type: string
     description: Used to tag the image (for example the version)
+  context:
+    required: false
+    type: string
+    description: Build's context is the set of files located in the specified path
+    default: .
+  file:
+    required: false
+    type: string
+    description: Path to the Dockerfile
+    default: /Dockerfile
   build_args:
     required: false
     type: string
@@ -44,7 +54,8 @@ runs:
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
-        context: .
+        context: ${{ inputs.context }}
+        file: ${{ inputs.context }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
