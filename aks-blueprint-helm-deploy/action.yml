@@ -49,7 +49,7 @@ runs:
         subscription-id: ${{ inputs.subscription-id }}
 
     - name: Gets K8s context
-      uses: azure/aks-set-context@v3
+      uses: azure/aks-set-context@4edaee69f820359371ee8bc85189ac03a21d3a58 # v3
       with:
         resource-group: ${{inputs.aks-resource-group}}
         cluster-name: ${{inputs.aks-name}}
