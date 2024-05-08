@@ -34,6 +34,11 @@ inputs:
     options:
       - 11
       - 17
+  prerelease:
+    required: false
+    type: boolean
+    description: True if it is a prerelease (no prod release)
+    default: false
 
 
 outputs:
@@ -88,4 +93,4 @@ runs:
         name: Release ${{ steps.semver.outputs.version }}
         makeLatest: latest
         generateReleaseNotes: true
-        prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
+        prerelease: ${{ inputs.prerelease }}
