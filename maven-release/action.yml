@@ -83,14 +83,14 @@ runs:
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
-      if: ${{ inputs.semver != 'skip' }}
       uses: ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e # v1.12.0
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
-        commit: ${{ github.ref_name }}
+        commit: ${{ (inputs.semver != 'skip' && github.ref_name) || '' }}
         tag: ${{ steps.semver.outputs.version }}
         name: Release ${{ steps.semver.outputs.version }}
-        makeLatest: latest
+        makeLatest: true
         generateReleaseNotes: true
         prerelease: ${{ inputs.prerelease }}
+        allowUpdates: ${{ inputs.semver == 'skip' }}
