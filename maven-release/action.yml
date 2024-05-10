@@ -93,3 +93,4 @@ runs:
         makeLatest: latest
         generateReleaseNotes: true
         prerelease: ${{ inputs.prerelease }}
+        allowUpdates: true
