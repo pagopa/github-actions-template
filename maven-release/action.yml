@@ -87,10 +87,10 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
-        #commit: ${{ (inputs.semver != 'skip' && github.ref_name) || '' }}
+        commit: ${{ (inputs.semver != 'skip' && github.ref_name) || '' }}
         tag: ${{ steps.semver.outputs.version }}
-        #name: Release ${{ steps.semver.outputs.version }}
-        makeLatest: latest
+        name: Release ${{ steps.semver.outputs.version }}
+        makeLatest: true
         generateReleaseNotes: true
         prerelease: ${{ inputs.prerelease }}
-        allowUpdates: true
+        allowUpdates: ${{ inputs.semver == 'skip' }}
