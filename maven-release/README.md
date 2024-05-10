@@ -38,7 +38,7 @@ The new version is saved in the output.
 | beta         | True if it is a beta version (update canary helm version) | false    | `boolean`                                        | false   |
 | skip_ci      | True if you want skip CI workflows on commit release      | false    | `boolean`                                        | true    |  
 | jdk_version  | Select the JDK version                                    | false    | `11`, `17`                                       | `11`    |
-| prerelease   | True if it is a prerelease (no prod release)              | false    | `boolean`                                        | false   |
+| prerelease   | True if it is a prerelease                                | false    | `boolean`                                        | false   |
 
 ## Output
 

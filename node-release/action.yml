@@ -25,6 +25,12 @@ inputs:
     type: boolean
     description: True you want skip the CI workflows on release commit
     default: true
+  prerelease:
+    required: false
+    type: boolean
+    description: True if it is a prerelease
+    default: false
+
 
 outputs:
   version:
@@ -109,4 +115,4 @@ runs:
         name: Release ${{ steps.semver.outputs.new_version }}
         makeLatest: latest
         generateReleaseNotes: true
-        prerelease: ${{ (inputs.semver == 'buildNumber' && 'true') || 'false' }}
+        prerelease: ${{ inputs.prerelease }}
