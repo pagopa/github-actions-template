@@ -28,9 +28,6 @@ runs:
         echo "IS_GIT_TAG=$(git tag --list | grep \"${{ github.ref_name }}\" | wc -l | bc -l)" >> $GITHUB_ENV
 #        if git tag --list "${{ github.ref_name }}" >/dev/null; then
 #          echo "IS_GIT_TAG=1" >> $GITHUB_ENV
-#        else
-#          echo "IS_GIT_TAG=0" >> $GITHUB_ENV
-#        fi
 
     # Set Environment
     - if: ${{ github.event.inputs.environment == null || github.event.inputs.environment == 'dev' }}
@@ -116,7 +113,7 @@ runs:
       run: echo "SEMVER=patch" >> $GITHUB_ENV
 
     # override previous SEMVER if in uat|prod env and deploy from specific tag
-    - if: ${{ env.IS_GIT_TAG && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
+    - if: ${{ env.IS_GIT_TAG == '1' && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
       shell: bash
       run: echo "SEMVER=skip" >> $GITHUB_ENV
 
