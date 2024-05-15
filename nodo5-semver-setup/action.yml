@@ -26,8 +26,6 @@ runs:
       shell: bash
       run: |
         echo "IS_GIT_TAG=$(git tag --list | grep \"${{ github.ref_name }}\" | wc -l | bc -l)" >> $GITHUB_ENV
-#        if git tag --list "${{ github.ref_name }}" >/dev/null; then
-#          echo "IS_GIT_TAG=1" >> $GITHUB_ENV
 
     # Set Environment
     - if: ${{ github.event.inputs.environment == null || github.event.inputs.environment == 'dev' }}
