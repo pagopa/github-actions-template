@@ -83,6 +83,7 @@ runs:
             git commit -m "Bump to version ${{ steps.semver.outputs.version }} [skip ci]" || exit 0
           else
             git commit -m "Bump to version ${{ steps.semver.outputs.version }}" || exit 0
+        fi
         git push origin ${{ github.ref_name}}
 
     - name: Create Release

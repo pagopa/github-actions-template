@@ -106,6 +106,7 @@ runs:
             git commit -m "Bump to version ${{ steps.semver.outputs.new_version }} [skip ci]" || exit 0
           else
             git commit -m "Bump to version ${{ steps.semver.outputs.new_version }}" || exit 0
+        fi
         git push origin ${{ github.ref_name}}
 
     - name: Create Release
