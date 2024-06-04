@@ -108,5 +108,5 @@ runs:
       if: ${{ inputs.only_tag }}
       shell: bash
       run: |
-        git tag ${{ steps.semver.outputs.new_version }}
-        git push origin ${{ steps.semver.outputs.new_version }}
+        git tag ${{ steps.semver.outputs.version }}
+        git push origin ${{ steps.semver.outputs.version }}
