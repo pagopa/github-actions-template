@@ -23,9 +23,10 @@ The new version is saved in the output.
     beta: false
     jdk_version: 11
       
-- run: echo "${{ steps.semver.outputs.version }}"
-
-- run: echo "${{ steps.semver.outputs.chart_version }}"
+- run: |
+    echo "${{ steps.semver.outputs.new_version }}"
+    echo "${{ steps.semver.outputs.old_version }}"
+    echo "${{ steps.semver.outputs.chart_version }}"
 ```
 
 ## Input
@@ -38,7 +39,8 @@ The new version is saved in the output.
 
 ## Output
 
-| Value         | Description       |
-|---------------|-------------------|
-| version       | New App Version   |
-| chart_version | New Chart Version |
+| Value         | Description                    |
+|---------------|--------------------------------|
+| old_version   | the current app version        |
+| new_version   | the new version after the bump |
+| chart_version | New Chart Version              |
