@@ -46,9 +46,12 @@ inputs:
     default: false
 
 outputs:
-  version:
+  old_version:
+    description: "old Version"
+    value: ${{ steps.semver.outputs.old_version }}
+  new_version:
     description: "New Version"
-    value: ${{ steps.semver.outputs.version }}
+    value: ${{ steps.semver.outputs.new_version }}
 
 runs:
   using: "composite"
