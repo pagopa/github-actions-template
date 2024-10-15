@@ -25,15 +25,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Check azure_devops_pat
-        if: ${{ inputs.enable_azure_devops_step == 'true' }}
-        shell: bash
-        run: |
-          if [ -z "${{ inputs.azure_devops_pat }}" ]; then
-            echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
-            exit 1
-          fi
-
       - name: Log in to the Github Container registry
         # https://github.com/docker/login-action/releases/tag/v3.3.0
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
@@ -60,6 +51,17 @@ runs:
           push: true
           tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
           labels: ${{ inputs.docker_labels }}
+
+      - name: Check azure_devops_pat
+        if: ${{ inputs.enable_azure_devops_step == 'true' }}
+        shell: bash
+        run: |
+          if [ -z "${{ inputs.azure_devops_pat }}" ]; then
+            echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
+            exit 1
+          fi
+
+          echo "🔨 Start launch trigger with Azure Devops"
 
       - name: Trigger Azure DevOps pipeline
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
