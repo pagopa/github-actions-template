@@ -16,9 +16,9 @@ inputs:
     required: false
   azure_devops_project_url:
     required: false
-  azure_pipeline_name:
+  azure_devops_pipeline_name:
     required: false
-  azuredevops_pat:
+  azure_devops_pat:
     required: false
     default: ''
 
@@ -64,7 +64,7 @@ runs:
         uses: jacopocarlini/azure-pipelines@v1.3
         with:
           azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
-          azure-pipeline-name: ${{ inputs.azure_pipeline_name }}
+          azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
           azure-devops-token: ${{ inputs.AZUREDEVOPS_PAT }}
           azure-template-parameters: |
             {
