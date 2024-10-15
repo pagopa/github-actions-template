@@ -18,7 +18,7 @@ inputs:
     required: false
   azure_pipeline_name:
     required: false
-  AZUREDEVOPS_PAT:
+  azuredevops_pat:
     required: false
     default: ''
 
