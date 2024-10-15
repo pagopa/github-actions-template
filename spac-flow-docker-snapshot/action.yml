@@ -25,12 +25,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Check AZUREDEVOPS_PAT
+      - name: Check azure_devops_pat
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
         shell: bash
         run: |
-          if [ -z "${{ inputs.AZUREDEVOPS_PAT }}" ]; then
-            echo "Error: AZUREDEVOPS_PAT is empty. This is required for triggering the Azure DevOps pipeline."
+          if [ -z "${{ inputs.azure_devops_pat }}" ]; then
+            echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
             exit 1
           fi
 
@@ -65,7 +65,7 @@ runs:
         with:
           azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
           azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
-          azure-devops-token: ${{ inputs.AZUREDEVOPS_PAT }}
+          azure-devops-token: ${{ inputs.azure_devops_pat }}
           azure-template-parameters: |
             {
                 "APPS": "${{ inputs.azure_devops_apps }}",
