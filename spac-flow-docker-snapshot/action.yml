@@ -1,0 +1,73 @@
+name: SPAC flow docker snapshot
+description: SPAC flow docker snapshot
+
+inputs:
+  current_branch:
+    required: true
+    type: string
+  environment:
+    required: true
+    type: string
+  docker_labels:
+    required: false
+    type: string
+    default: |
+      maintainer=https://pagopa.it
+      org.opencontainers.image.source=https://github.com/${{ github.repository }}
+  enable_azure_devops_step:
+    required: false
+    type: boolean
+    default: false
+  azure_devops_apps:
+    required: false
+    type: string
+  azure_devops_project_url:
+    required: false
+    type: string
+  azure_pipeline_name:
+    required: false
+    type: string
+secrets:
+  AZUREDEVOPS_PAT:
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+      - name: Log in to the Github Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Set Docker tags
+        id: set_docker_tags
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:snapshot" >> $GITHUB_OUTPUT
+          else
+            echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:snapshot,ghcr.io/${{ github.repository }}:snapshot-${{ inputs.current_branch }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
+          labels: ${{ inputs.docker_labels }}
+
+      - name: Trigger Azure DevOps pipeline
+        if: ${{ inputs.enable_azure_devops_step }}
+        uses: jacopocarlini/azure-pipelines@v1.3
+        with:
+          azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
+          azure-pipeline-name: ${{ inputs.azure_pipeline_name }}
+          azure-devops-token: ${{ secrets.AZUREDEVOPS_PAT }}
+          azure-template-parameters: |
+            {
+                "APPS": "${{ inputs.azure_devops_apps }}",
+                "POSTMAN_BRANCH": "${{ inputs.current_branch }}"
+            }
+          azure-pipeline-variables: '{"system.debug": "true"}'
