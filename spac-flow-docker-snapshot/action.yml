@@ -22,11 +22,20 @@ inputs:
     required: false
   AZUREDEVOPS_PAT:
     required: false
-    default: 'EMPTY_PASSWORD'
+    default: ''
 
 runs:
   using: "composite"
   steps:
+      - name: Check AZUREDEVOPS_PAT
+        if: ${{ inputs.enable_azure_devops_step == 'true' }}
+        shell: bash
+        run: |
+          if [ -z "${{ inputs.AZUREDEVOPS_PAT }}" ]; then
+            echo "Error: AZUREDEVOPS_PAT is empty. This is required for triggering the Azure DevOps pipeline."
+            exit 1
+          fi
+          
       - name: Log in to the Github Container registry
         uses: docker/login-action@v3
         with:
@@ -53,7 +62,7 @@ runs:
           labels: ${{ inputs.docker_labels }}
 
       - name: Trigger Azure DevOps pipeline
-        if: ${{ inputs.enable_azure_devops_step }}
+        if: ${{ inputs.enable_azure_devops_step == 'true' }}
         uses: jacopocarlini/azure-pipelines@v1.3
         with:
           azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
