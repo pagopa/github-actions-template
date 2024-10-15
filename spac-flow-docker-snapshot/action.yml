@@ -36,6 +36,7 @@ runs:
 
       - name: Set Docker tags
         id: set_docker_tags
+        shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:snapshot" >> $GITHUB_OUTPUT
