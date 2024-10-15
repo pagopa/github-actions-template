@@ -4,32 +4,25 @@ description: SPAC flow docker snapshot
 inputs:
   current_branch:
     required: true
-    type: string
   environment:
     required: true
-    type: string
   docker_labels:
     required: false
-    type: string
     default: |
       maintainer=https://pagopa.it
       org.opencontainers.image.source=https://github.com/${{ github.repository }}
   enable_azure_devops_step:
     required: false
-    type: boolean
     default: false
   azure_devops_apps:
     required: false
-    type: string
   azure_devops_project_url:
     required: false
-    type: string
   azure_pipeline_name:
     required: false
-    type: string
-secrets:
   AZUREDEVOPS_PAT:
     required: false
+    default: 'EMPTY_PASSWORD'
 
 runs:
   using: "composite"
@@ -64,7 +57,7 @@ runs:
         with:
           azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
           azure-pipeline-name: ${{ inputs.azure_pipeline_name }}
-          azure-devops-token: ${{ secrets.AZUREDEVOPS_PAT }}
+          azure-devops-token: ${{ inputs.AZUREDEVOPS_PAT }}
           azure-template-parameters: |
             {
                 "APPS": "${{ inputs.azure_devops_apps }}",
