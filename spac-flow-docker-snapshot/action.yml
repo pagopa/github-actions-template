@@ -4,8 +4,6 @@ description: SPAC flow docker snapshot
 inputs:
   current_branch:
     required: true
-  environment:
-    required: true
   docker_labels:
     required: false
     default: |
@@ -35,7 +33,7 @@ runs:
             echo "Error: AZUREDEVOPS_PAT is empty. This is required for triggering the Azure DevOps pipeline."
             exit 1
           fi
-          
+
       - name: Log in to the Github Container registry
         uses: docker/login-action@v3
         with:
