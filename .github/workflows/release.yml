@@ -1,40 +1,24 @@
 name: Release
 
 on:
-  # Trigger the workflow on push on the main branch
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
   push:
     branches:
       - main
     paths-ignore:
-      - 'CODEOWNERS'
-      - '**.md'
-      - '.**'
-  # Trigger the workflow by dispatching
-  workflow_dispatch:
+      - "CODEOWNERS"
+      - "**.md"
+      - ".**"
 
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        id: checkout
-        # from https://github.com/actions/checkout/commits/main
-        uses: actions/checkout@1f9a0c22da41e6ebfa534300ef656657ea2c6707
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Release
+      - name: Release action
         id: release
-        # from https://github.com/cycjimmy/semantic-release-action/commits/main
-        uses: cycjimmy/semantic-release-action@bdd914ff2423e2792c73475f11e8da603182f32d
+        # https://github.com/pagopa/eng-github-actions-iac-template/releases/tag/v1.20.0
+        uses: pagopa/eng-github-actions-iac-template/global/release-action@5c7e5f690ad0f07f3bd945bdebf2a6c7a575b33f
         with:
-          semantic_version: 18.0.0
-          extra_plugins: |
-            @semantic-release/release-notes-generator@10.0.3
-            @semantic-release/git@10.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          github_token: ${{ secrets.GITHUB_TOKEN }}
