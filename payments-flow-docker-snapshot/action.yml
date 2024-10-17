@@ -1,5 +1,5 @@
-name: SPAC flow docker snapshot
-description: SPAC flow docker snapshot
+name: Payments flow docker snapshot
+description: Payments flow docker snapshot
 
 inputs:
   current_branch:
