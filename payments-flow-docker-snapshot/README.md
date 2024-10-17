@@ -1,4 +1,4 @@
-# spac-flow-docker-snapshot
+# payments-flow-docker-snapshot
 
 Allows to build docker image with the follow tags:
 
@@ -10,7 +10,7 @@ and if runned manually, create a fake tag called `develop-snapshot`
 ## how to use
 
 ```yaml
-name: SPAC Snapshot docker build and push
+name: payments Snapshot docker build and push
 
 on:
   push:
@@ -26,7 +26,7 @@ env:
   CURRENT_BRANCH: ${{ github.event.inputs.branch || github.ref_name }}
 
 jobs:
-  spac-flow-docker-snapshot:
+  payments-flow-docker-snapshot:
     runs-on: ubuntu-22.04
     environment: dev
     steps:
@@ -37,7 +37,7 @@ jobs:
           ref: ${{ env.CURRENT_BRANCH }}
 
       - name: 📦 Run Snapshot Docker Build/Push & Trigger
-        uses: pagopa/github-actions-template/spac-flow-docker-snapshot@spac-flow-docker-snapshot
+        uses: pagopa/github-actions-template/payments-flow-docker-snapshot@main
         with:
           current_branch: ${{ github.ref_name }}
           enable_azure_devops_step: 'true'
