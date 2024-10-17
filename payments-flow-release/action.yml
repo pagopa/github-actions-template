@@ -12,8 +12,6 @@ inputs:
   enable_azure_devops_step:
     required: false
     default: false
-  azure_devops_apps:
-    required: false
   azure_devops_project_url:
     required: false
   azure_devops_pipeline_name:
@@ -40,9 +38,9 @@ runs:
 
     - name: 🚀 Release
       id: release
-      uses: pagopa/eng-github-actions-iac-template/global/release-action@release-with-
+      uses: pagopa/eng-github-actions-iac-template/global/release-action@main
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ github.token }}
         tag_format: ${{ steps.set-tag-format.outputs.TAG_FORMAT }}
         branches: ${{ github.ref_name }}
 
@@ -69,7 +67,7 @@ runs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ github.token }}
 
     - name: 📦 Build and push Docker image with release version
       id: docker_build_push
