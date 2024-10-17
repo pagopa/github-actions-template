@@ -89,5 +89,5 @@ runs:
         azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
         azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
         azure-devops-token: ${{ inputs.azure_devops_pat }}
-        azure-template-parameters: ${{ inputs.azure_template_parameters }}
         azure-pipeline-variables: '{"system.debug": "true"}'
+        azure-template-parameters: ${{ inputs.azure_template_parameters }}
