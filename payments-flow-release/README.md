@@ -1,32 +1,30 @@
-# payments-flow-docker-snapshot
+# payments-flow-release
 
-Allows to build docker image with the follow tags:
+Allows to make a release and build docker image with the follow tags:
 
-- snapshot
-- snapshot-(branch name)
-
-and if runned manually, create a fake tag called `develop-snapshot`
+- develop-vX.Y.Z
+- uat-vX.Y.Z
+- vX.Y.Z
 
 ## how to use
 
 ```yaml
-name: 📦 Payments Snapshot docker
+name: 🚀 Payments release
 
 on:
   push:
-    branches-ignore:
-      - 'main'
+    branches:
+      - develop
+      - uat
+      - main
     paths-ignore:
       - 'CODEOWNERS'
       - '**.md'
       - '.**'
   workflow_dispatch:
 
-env:
-  CURRENT_BRANCH: ${{ github.event.inputs.branch || github.ref_name }}
-
 jobs:
-  payments-flow-docker-snapshot:
+  payments-flow-release:
     runs-on: ubuntu-22.04
     environment: dev
     steps:
@@ -34,15 +32,14 @@ jobs:
         # https://github.com/actions/checkout/releases/tag/v4.2.1
         uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
         with:
-          ref: ${{ env.CURRENT_BRANCH }}
+          ref: ${{ github.ref_name }}
 
-      - name: 📦 Run Snapshot Docker Build/Push & Trigger
+      - name: 🚀 release + docker + azdo
         # https://github.com/pagopa/github-actions-template/releases/tag/v1.16.0
-        uses: pagopa/github-actions-template/payments-flow-docker-snapshot@main
+        uses: pagopa/github-actions-template/payments-flow-release@payments-release
         with:
           current_branch: ${{ github.ref_name }}
           enable_azure_devops_step: 'true'
-          azure_devops_apps: "[one-color]"
           azure_devops_project_url: 'https://dev.azure.com/pagopaspa/devopslab-projects'
           azure_devops_pipeline_name: 'devopslab-diego-deploy.deploy'
           azure_devops_pat: ${{ secrets.AZUREDEVOPS_PAT }}
