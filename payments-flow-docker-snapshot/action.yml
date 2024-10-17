@@ -21,11 +21,13 @@ inputs:
   azure_devops_pat:
     required: false
     default: ''
+  azure_template_parameters:
+    required: false
 
 runs:
   using: "composite"
   steps:
-      - name: Log in to the Github Container registry
+      - name: 🛃 Log in to the Github Container registry
         # https://github.com/docker/login-action/releases/tag/v3.3.0
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
@@ -33,7 +35,7 @@ runs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Set Docker tags
+      - name: 🤔 Set Docker tags
         id: set_docker_tags
         shell: bash
         run: |
@@ -43,7 +45,7 @@ runs:
             echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:snapshot,ghcr.io/${{ github.repository }}:snapshot-${{ inputs.current_branch }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build and push Docker image
+      - name: 🚀 Build and push Docker image
         # https://github.com/docker/build-push-action/releases/tag/v6.9.0
         uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75
         with:
@@ -52,7 +54,10 @@ runs:
           tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
           labels: ${{ inputs.docker_labels }}
 
-      - name: Check azure_devops_pat
+#
+# AZDO
+#
+      - name: 🤔 Check azure_devops_pat
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
         shell: bash
         run: |
@@ -63,16 +68,12 @@ runs:
 
           echo "🔨 Start launch trigger with Azure Devops"
 
-      - name: Trigger Azure DevOps pipeline
+      - name: 🚂 Trigger Azure DevOps pipeline
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
         uses: jacopocarlini/azure-pipelines@v1.3
         with:
           azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
           azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
           azure-devops-token: ${{ inputs.azure_devops_pat }}
-          azure-template-parameters: |
-            {
-                "APPS": "${{ inputs.azure_devops_apps }}",
-                "POSTMAN_BRANCH": "${{ inputs.current_branch }}"
-            }
           azure-pipeline-variables: '{"system.debug": "true"}'
+          azure-template-parameters: ${{ inputs.azure_template_parameters }}
