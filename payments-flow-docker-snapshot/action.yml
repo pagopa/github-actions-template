@@ -70,7 +70,8 @@ runs:
 
       - name: 🚂 Trigger Azure DevOps pipeline
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
-        uses: jacopocarlini/azure-pipelines@v1.3
+        # https://github.com/pagopa/azure-pipelines/releases/tag/v2.0.0
+        uses: pagopa/azure-pipelines@51d971651241601a348e4e2ed2431b8b7576d4f0
         with:
           azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
           azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
