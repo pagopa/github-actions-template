@@ -84,7 +84,7 @@ runs:
 #
     - name: 🚂 Trigger Azure DevOps pipeline
       if: inputs.enable_azure_devops_step == 'true' && steps.release.outputs.new_release_published == 'true'
-      uses: jacopocarlini/azure-pipelines@v1.3
+      uses: jacopocarlini/azure-pipelines@b9721743a54e862597395b4a70727cfdc03028fb # v1.3
       with:
         azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
         azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
