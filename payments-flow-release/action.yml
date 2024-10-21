@@ -53,11 +53,11 @@ runs:
       shell: bash
       run: |
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-          echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
+          echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-v${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
         elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
-          echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:uat-${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:uat-latest" >> $GITHUB_OUTPUT
+          echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:uat-v${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:uat-latest" >> $GITHUB_OUTPUT
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-          echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:${{ steps.release.outputs.new_release_version }}" >> $GITHUB_OUTPUT
+          echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:v${{ steps.release.outputs.new_release_version }}" >> $GITHUB_OUTPUT
         fi
 
     - name: 🛃 Log in to the Github Container registry
