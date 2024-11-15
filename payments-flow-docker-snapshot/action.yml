@@ -26,12 +26,7 @@ inputs:
     required: false
     default: ''
   azure_template_parameters:
-    description: |
-        Json attribute with all the parameters that must be send to the pipeline (⚠️ this parameters must exists)
-        {
-          "APPS": "[one-color]",
-          "POSTMAN_BRANCH": "${{ github.ref_name }}"
-        }
+    description: Json attribute with all the parameters that must be send to the pipeline (⚠️ this parameters must exists)
     required: false
 
 runs:
@@ -64,9 +59,9 @@ runs:
           tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
           labels: ${{ inputs.docker_labels }}
 
-      #
-      # AZDO
-      #
+#
+# AZDO
+#
       - name: 🤔 Check azure_devops_pat
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
         shell: bash
