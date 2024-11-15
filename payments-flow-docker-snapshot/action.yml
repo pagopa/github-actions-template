@@ -40,6 +40,9 @@ runs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      #
+      # Docker
+      #
       - name: 🤔 Set Docker tags
         id: set_docker_tags
         shell: bash
@@ -59,9 +62,9 @@ runs:
           tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
           labels: ${{ inputs.docker_labels }}
 
-#
-# AZDO
-#
+      #
+      # AZDO
+      #
       - name: 🤔 Check azure_devops_pat
         if: ${{ inputs.enable_azure_devops_step == 'true' }}
         shell: bash
