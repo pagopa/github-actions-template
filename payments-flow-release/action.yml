@@ -3,22 +3,35 @@ description: Payments release
 
 inputs:
   current_branch:
+    description: Branch used to launch the action
     required: true
   docker_labels:
+    description: Labels for docker push
     required: false
     default: |
       maintainer=https://pagopa.it
       org.opencontainers.image.source=https://github.com/${{ github.repository }}
   enable_azure_devops_step:
+    description: Are azure devops triggers enabled?
     required: false
-    default: false
+    default: "false"
   azure_devops_project_url:
+    description: Azure devops project url like (e.g. `https://dev.azure.com/pagopaspa/arc-projects``)
     required: false
   azure_devops_pipeline_name:
+    description: Pipeline name inside the project (e.g. `arc-cittadini-deploy-aks.deploy`)
     required: false
   azure_devops_pat:
+    description: Personal secret azure devops PAT
     required: false
+    default: ''
   azure_template_parameters:
+    description: |
+        Json attribute with all the parameters that must be send to the pipeline (⚠️ this parameters must exists)
+        {
+          "APPS": "[one-color]",
+          "POSTMAN_BRANCH": "${{ github.ref_name }}"
+        }
     required: false
 
 runs:
@@ -44,9 +57,9 @@ runs:
         tag_format: ${{ steps.set-tag-format.outputs.TAG_FORMAT }}
         branches: ${{ github.ref_name }}
 
-#
-# Docker
-#
+    #
+    # Docker
+    #
     - name: 🔨 Set Docker tags
       id: set_docker_tags
       if: steps.release.outputs.new_release_published == 'true'
@@ -79,9 +92,20 @@ runs:
         tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
         labels: ${{ inputs.docker_labels }}
 
-#
-# AZDO
-#
+    #
+    # AZDO
+    #
+    - name: 🤔 Check azure_devops_pat
+      if: ${{ inputs.enable_azure_devops_step == 'true' }}
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.azure_devops_pat }}" ]; then
+          echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
+          exit 1
+        fi
+
+        echo "🔨 Start launch trigger with Azure Devops"
+
     - name: 🚂 Trigger Azure DevOps pipeline
       if: inputs.enable_azure_devops_step == 'true' && steps.release.outputs.new_release_published == 'true'
       # https://github.com/pagopa/azure-pipelines/releases/tag/v2.0.0
