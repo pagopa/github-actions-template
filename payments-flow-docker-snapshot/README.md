@@ -42,7 +42,6 @@ jobs:
         with:
           current_branch: ${{ github.ref_name }}
           enable_azure_devops_step: 'true'
-          azure_devops_apps: "[one-color]"
           azure_devops_project_url: 'https://dev.azure.com/pagopaspa/devopslab-projects'
           azure_devops_pipeline_name: 'devopslab-diego-deploy.deploy'
           azure_devops_pat: ${{ secrets.AZUREDEVOPS_PAT }}
