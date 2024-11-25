@@ -27,7 +27,9 @@ The new version is saved in the output.
     prerelease: false
     only_tag: false
       
-- run: echo "${{ steps.release.outputs.version }}"
+- run: |
+    echo "${{ steps.release.outputs.old_version }}"
+    echo "${{ steps.release.outputs.new_version }}"
 ```
 
 ## Input
@@ -44,6 +46,7 @@ The new version is saved in the output.
 
 ## Output
 
-| Value   | Description |
-|---------|-------------|
-| version | New Version |
+| Value       | Description                    |
+|-------------|--------------------------------|
+| old_version | the current app version        |
+| new_version | the new version after the bump |
