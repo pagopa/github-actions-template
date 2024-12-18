@@ -80,7 +80,7 @@ runs:
         for i in helm/values-*.yaml; do
           [ -f "$i" ] || break
           yq -i ".microservice-chart.canaryDelivery.create = true" "$i"
-          yq -i ".microservice-chart.canaryDelivery.deployment.image.tag = \"${{ inputs.version }}\"" "$i"
+          yq -i ".microservice-chart.canaryDelivery.image.tag = \"${{ inputs.version }}\"" "$i"
           git add "$i"
         done
 
