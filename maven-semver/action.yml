@@ -27,7 +27,10 @@ inputs:
 
 
 outputs:
-  version:
+  old_version:
+    description: "Old App Version"
+    value: ${{ steps.get_current_app_version.outputs.version }}
+  new_version:
     description: "New App Version"
     value: ${{ steps.get_app_version.outputs.version }}
   chart_version:
@@ -66,6 +69,12 @@ runs:
       if: ${{ github.ref_name != 'main' }}
       shell: bash
 
+    - id: get_current_app_version
+      name: Get Version
+      run: |
+        echo "old_version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Set build-number
       run: |
         mvn build-helper:parse-version versions:set -DnewVersion='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-${parsedVersion.nextBuildNumber}${{env.BRANCH}}'
@@ -94,14 +103,14 @@ runs:
       name: Get Version
       run: |
         echo "🆙 Bump App Version to $(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)"
-        echo "version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+        echo "new_version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Helm Bump
       if: ${{ inputs.semver != 'skip' }}
       uses: pagopa/github-actions-template/helm-bump@main
       with:
-        version: ${{ steps.get_app_version.outputs.version }}
+        version: ${{ steps.get_app_version.outputs.new_version }}
         beta: ${{ inputs.beta }}
 
 
@@ -109,21 +118,21 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        echo "📑 Bump Openapi Version to ${{ steps.get_app_version.outputs.version }}"
+        echo "📑 Bump Openapi Version to ${{ steps.get_app_version.outputs.new_version }}"
 
         for i in openapi/*.json; do
           [ -f "$i" ] || break
-          cat <<< "$(jq ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i")" > "$i"
+          cat <<< "$(jq ".info.version = \"${{ steps.get_app_version.outputs.new_version }}\"" "$i")" > "$i"
           git add $i
         done
         for i in openapi/*.yaml; do
           [ -f "$i" ] || break
-          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.new_version }}\"" "$i"
           git add "$i"
         done
         for i in openapi/*.yml; do
           [ -f "$i" ] || break
-          yq -i ".info.version = \"${{ steps.get_app_version.outputs.version }}\"" "$i"
+          yq -i ".info.version = \"${{ steps.get_app_version.outputs.new_version }}\"" "$i"
           git add "$i"
         done
 
