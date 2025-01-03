@@ -101,6 +101,8 @@ runs:
     - name: 🚀 Helm Deploy
       shell: bash
       run: |
+        echo "CURRENT DIR $PWD"
+        ls -la
         echo "🚀 Launch helm deploy"
 
         helm upgrade --namespace ${{ inputs.namespace }} \
