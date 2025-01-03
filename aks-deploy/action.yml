@@ -81,18 +81,20 @@ runs:
         admin: 'false'
         use-kubelogin: 'true'
 
-    - name: Setup Working Directory
+    - name: Determine Working Directory
+      id: determine-dir
       shell: bash
       run: |
         if [ -n "${{ inputs.working_directory }}" ]; then
-          cd "${{ inputs.working_directory }}"
-          echo "Changed working directory to: $PWD"
+          echo "working_dir=${{ inputs.working_directory }}" >> $GITHUB_ENV
         else
-          echo "No working directory set, continuing in default location: $PWD"
+          echo "working_dir=." >> $GITHUB_ENV
         fi
+        echo "Working directory determined: $working_dir"
 
     - name: 🛠️ Helm configure repos
       shell: bash
+      working-directory: ${{ env.working_dir }}
       run: |
         echo "CONFIG REPO - CURRENT DIR $PWD"
         ls -la
@@ -102,6 +104,7 @@ runs:
 
     - name: 🚀 Helm Deploy
       shell: bash
+      working-directory: ${{ env.working_dir }}
       run: |
         echo "CURRENT DIR $PWD"
         ls -la
