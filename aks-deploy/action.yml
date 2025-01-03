@@ -94,6 +94,8 @@ runs:
     - name: 🛠️ Helm configure repos
       shell: bash
       run: |
+        echo "CONFIG REPO - CURRENT DIR $PWD"
+        ls -la
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build helm
         echo "✅ aks blueprint configured"
