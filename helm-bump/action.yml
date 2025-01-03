@@ -39,6 +39,7 @@ runs:
 
     - id: get_chart_version
       name: Get Version
+      working-directory: ${{ env.working_dir }}
       run: |
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
