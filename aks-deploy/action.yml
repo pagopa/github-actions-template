@@ -96,8 +96,6 @@ runs:
       shell: bash
       working-directory: ${{ env.working_dir }}
       run: |
-        echo "CONFIG REPO - CURRENT DIR $PWD"
-        ls -la
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build helm
         echo "✅ aks blueprint configured"
@@ -106,8 +104,6 @@ runs:
       shell: bash
       working-directory: ${{ env.working_dir }}
       run: |
-        echo "CURRENT DIR $PWD"
-        ls -la
         echo "🚀 Launch helm deploy"
 
         helm upgrade --namespace ${{ inputs.namespace }} \
