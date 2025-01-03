@@ -47,6 +47,11 @@ inputs:
     description: options you can pass to helm upgrade command
     type: string
     default: ''
+  working_directory:
+    required: false
+    description: working directory where run command is executed
+    type: string
+    default: ''
   timeout:
     required: false
     description: to set the timeout for the helm upgrade command
@@ -55,6 +60,7 @@ inputs:
 
 runs:
   using: "composite"
+
   steps:
     - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       with:
@@ -74,6 +80,16 @@ runs:
         cluster-name: ${{inputs.cluster_name}}
         admin: 'false'
         use-kubelogin: 'true'
+
+    - name: Setup Working Directory
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.working_directory }}" ]; then
+          cd "${{ inputs.working_directory }}"
+          echo "Changed working directory to: $PWD"
+        else
+          echo "No working directory set, continuing in default location: $PWD"
+        fi
 
     - name: 🛠️ Helm configure repos
       shell: bash
