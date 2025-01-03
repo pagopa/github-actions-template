@@ -34,6 +34,11 @@ inputs:
     options:
       - 11
       - 17
+  working_directory:
+    required: false
+    description: Working directory where run command is executed
+    type: string
+    default: ''
 
 
 outputs:
@@ -59,12 +64,12 @@ runs:
 
     - name: Update Semantic Version
       id: semver
-      uses: pagopa/github-actions-template/sbt-semver@main
+      uses: pagopa/github-actions-template/sbt-semver@change-working-directory # TODO set main
       with:
         semver: ${{inputs.semver}}
         beta: ${{inputs.beta}}
         jdk_version: ${{inputs.jdk_version}}
-
+        working_directory: ${{inputs.working_directory}}
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}

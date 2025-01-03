@@ -24,6 +24,11 @@ inputs:
     options:
       - 11
       - 17
+  working_directory:
+    required: false
+    description: Working directory where run command is executed
+    type: string
+    default: ''
 
 
 outputs:
@@ -126,11 +131,11 @@ runs:
 
     - name: Helm Bump
       if: ${{ inputs.semver != 'skip' }}
-      uses: pagopa/github-actions-template/helm-bump@main
+      uses: pagopa/github-actions-template/helm-bump@change-working-directory # TODO set main
       with:
         version: ${{ steps.get_app_version.outputs.version }}
         beta: ${{ inputs.beta }}
-
+        working_directory: ${{ inputs.working_directory }}
 
     - name: Update Openapi/Swagger Version
       if: ${{ inputs.semver != 'skip' }}
