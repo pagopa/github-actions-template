@@ -64,7 +64,7 @@ runs:
 
     - name: Update Semantic Version
       id: semver
-      uses: pagopa/github-actions-template/sbt-semver@change-working-directory # TODO set main
+      uses: pagopa/github-actions-template/sbt-semver@main
       with:
         semver: ${{inputs.semver}}
         beta: ${{inputs.beta}}
