@@ -10,6 +10,11 @@ inputs:
     required: true
     type: boolean
     description: True if it is a beta version (update canary helm version)
+  working_directory:
+    required: false
+    description: working directory where run command is executed
+    type: string
+    default: ''
 
 runs:
   using: "composite"
@@ -21,8 +26,20 @@ runs:
         echo "beta: ${{ inputs.beta}}"
       shell: bash
 
+    - name: Determine Working Directory
+      id: determine-dir
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.working_directory }}" ]; then
+          echo "working_dir=${{ inputs.working_directory }}" >> $GITHUB_ENV
+        else
+          echo "working_dir=." >> $GITHUB_ENV
+        fi
+        echo "Working directory determined: $working_dir"
+
     - id: get_chart_version
       name: Get Version
+      working-directory: ${{ env.working_dir }}
       run: |
         CHART_FILE="helm/Chart.yaml"
         if [[ -f "$CHART_FILE" ]]; then
@@ -39,6 +56,7 @@ runs:
 
     - name: Update Chart Version
       shell: bash
+      working-directory: ${{ env.working_dir }}
       run: |
         echo "📑 Bump Chart Version to ${{ steps.bump_chart_version.outputs.new_version }}"
         
@@ -50,6 +68,7 @@ runs:
 
     - name: Update Stable Version Helm
       shell: bash
+      working-directory: ${{ env.working_dir }}
       if: ${{ inputs.beta != 'true' }}
       run: |
         echo "🚀 Bump Stable Version to ${{ inputs.version }}"
@@ -68,6 +87,7 @@ runs:
 
     - name: Update Canary Version Helm
       shell: bash
+      working-directory: ${{ env.working_dir }}
       if: ${{ inputs.beta == 'true' }}
       run: |
         echo "🐤 Bump Canary Version to ${{ inputs.version }}"

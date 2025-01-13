@@ -47,6 +47,11 @@ inputs:
     description: options you can pass to helm upgrade command
     type: string
     default: ''
+  working_directory:
+    required: false
+    description: working directory where run command is executed
+    type: string
+    default: ''
   timeout:
     required: false
     description: to set the timeout for the helm upgrade command
@@ -55,6 +60,7 @@ inputs:
 
 runs:
   using: "composite"
+
   steps:
     - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       with:
@@ -75,8 +81,20 @@ runs:
         admin: 'false'
         use-kubelogin: 'true'
 
+    - name: Determine Working Directory
+      id: determine-dir
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.working_directory }}" ]; then
+          echo "working_dir=${{ inputs.working_directory }}" >> $GITHUB_ENV
+        else
+          echo "working_dir=." >> $GITHUB_ENV
+        fi
+        echo "Working directory determined: $working_dir"
+
     - name: 🛠️ Helm configure repos
       shell: bash
+      working-directory: ${{ env.working_dir }}
       run: |
         helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
         helm dep build helm
@@ -84,6 +102,7 @@ runs:
 
     - name: 🚀 Helm Deploy
       shell: bash
+      working-directory: ${{ env.working_dir }}
       run: |
         echo "🚀 Launch helm deploy"
 

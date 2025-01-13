@@ -34,6 +34,11 @@ inputs:
     options:
       - 11
       - 17
+  working_directory:
+    required: false
+    description: Working directory where run command is executed
+    type: string
+    default: ''
 
 
 outputs:
@@ -64,7 +69,7 @@ runs:
         semver: ${{inputs.semver}}
         beta: ${{inputs.beta}}
         jdk_version: ${{inputs.jdk_version}}
-
+        working_directory: ${{inputs.working_directory}}
 
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
