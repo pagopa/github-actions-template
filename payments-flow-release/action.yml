@@ -1,33 +1,20 @@
-name: Payments release
-description: Payments release
+name: Payments Release
+description: Payments Release
 
 inputs:
   current_branch:
     description: Branch used to launch the action
     required: true
+  docker_build: 
+    description: Docker build
+    required: false
+    default: "true"
   docker_labels:
     description: Labels for docker push
     required: false
     default: |
       maintainer=https://pagopa.it
       org.opencontainers.image.source=https://github.com/${{ github.repository }}
-  enable_azure_devops_step:
-    description: Are azure devops triggers enabled?
-    required: false
-    default: "false"
-  azure_devops_project_url:
-    description: Azure devops project url like (e.g. `https://dev.azure.com/pagopaspa/arc-projects``)
-    required: false
-  azure_devops_pipeline_name:
-    description: Pipeline name inside the project (e.g. `arc-cittadini-deploy-aks.deploy`)
-    required: false
-  azure_devops_pat:
-    description: Personal secret azure devops PAT
-    required: false
-    default: ''
-  azure_template_parameters:
-    description: Json attribute with all the parameters that must be send to the pipeline. See README for example (⚠️ this parameters must exists)
-    required: false
 
 runs:
   using: "composite"
@@ -57,20 +44,23 @@ runs:
     #
     - name: 🔨 Set Docker tags
       id: set_docker_tags
-      if: steps.release.outputs.new_release_published == 'true'
+      if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
       shell: bash
       run: |
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          # develop-latest, develop-vx.y.z, latest
           echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-v${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
         elif [[ "${{ github.ref }}" == "refs/heads/uat" ]]; then
+          # uat-vx.y.z, uat-latest
           echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:uat-v${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:uat-latest" >> $GITHUB_OUTPUT
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          # vx.y.z, latest
           echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:v${{ steps.release.outputs.new_release_version }}" >> $GITHUB_OUTPUT
         fi
 
     - name: 🛃 Log in to the Github Container registry
       id: docker_login
-      if: steps.release.outputs.new_release_published == 'true'
+      if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
       uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
       with:
         registry: ghcr.io
@@ -79,35 +69,10 @@ runs:
 
     - name: 📦 Build and push Docker image with release version
       id: docker_build_push
-      if: steps.release.outputs.new_release_published == 'true'
+      if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
       uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c #v6.3.0
       with:
         context: .
         push: true
         tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
         labels: ${{ inputs.docker_labels }}
-
-    #
-    # AZDO
-    #
-    - name: 🤔 Check azure_devops_pat
-      if: ${{ inputs.enable_azure_devops_step == 'true' }}
-      shell: bash
-      run: |
-        if [ -z "${{ inputs.azure_devops_pat }}" ]; then
-          echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
-          exit 1
-        fi
-
-        echo "🔨 Start launch trigger with Azure Devops"
-
-    - name: 🚂 Trigger Azure DevOps pipeline
-      if: inputs.enable_azure_devops_step == 'true' && steps.release.outputs.new_release_published == 'true'
-      # https://github.com/pagopa/azure-pipelines/releases/tag/v2.0.0
-      uses: pagopa/azure-pipelines@51d971651241601a348e4e2ed2431b8b7576d4f0
-      with:
-        azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
-        azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
-        azure-devops-token: ${{ inputs.azure_devops_pat }}
-        azure-pipeline-variables: '{"system.debug": "true"}'
-        azure-template-parameters: ${{ inputs.azure_template_parameters }}
