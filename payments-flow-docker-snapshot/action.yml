@@ -48,7 +48,7 @@ runs:
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:snapshot" >> $GITHUB_OUTPUT
+            echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:develop-latest,ghcr.io/${{ github.repository }}:snapshot,ghcr.io/${{ github.repository }}:snapshot-${{ inputs.current_branch }}" >> $GITHUB_OUTPUT
           else
             echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:snapshot,ghcr.io/${{ github.repository }}:snapshot-${{ inputs.current_branch }}" >> $GITHUB_OUTPUT
           fi
