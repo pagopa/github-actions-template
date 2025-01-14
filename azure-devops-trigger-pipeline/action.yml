@@ -34,7 +34,7 @@ runs:
         echo "🔨 Start launch trigger with Azure Devops"
 
     - name: 🚂 Trigger Azure DevOps pipeline
-      if: inputs.enable_azure_devops_step == 'true' && steps.release.outputs.new_release_published == 'true'
+      if: inputs.enable_azure_devops_step == 'true'
       # https://github.com/pagopa/azure-pipelines/releases/tag/v2.0.0
       uses: pagopa/azure-pipelines@51d971651241601a348e4e2ed2431b8b7576d4f0
       with:
