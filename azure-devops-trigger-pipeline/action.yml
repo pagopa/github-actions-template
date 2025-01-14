@@ -1,0 +1,45 @@
+name: 🎯 Azure Devops pipeline trigger
+description: Azure Devops pipeline trigger
+
+inputs:
+  enable_azure_devops_step:
+    description: Are azure devops triggers enabled?
+    default: "false"
+  azure_devops_project_url:
+    description: Azure devops project url like (e.g. `https://dev.azure.com/pagopaspa/arc-projects``)
+  azure_devops_pipeline_name:
+    description: Pipeline name inside the project (e.g. `arc-cittadini-deploy-aks.deploy`)
+  azure_devops_pat:
+    description: Personal secret azure devops PAT
+    default: ''
+  azure_template_parameters:
+    description: Json attribute with all the parameters that must be send to the pipeline. See README for example (⚠️ this parameters must exists)
+
+runs:
+  using: "composite"
+  steps:
+
+    #
+    # AZDO
+    #
+    - name: 🤔 Check azure_devops_pat
+      if: ${{ inputs.enable_azure_devops_step == 'true' }}
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.azure_devops_pat }}" ]; then
+          echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
+          exit 1
+        fi
+
+        echo "🔨 Start launch trigger with Azure Devops"
+
+    - name: 🚂 Trigger Azure DevOps pipeline
+      if: inputs.enable_azure_devops_step == 'true' && steps.release.outputs.new_release_published == 'true'
+      # https://github.com/pagopa/azure-pipelines/releases/tag/v2.0.0
+      uses: pagopa/azure-pipelines@51d971651241601a348e4e2ed2431b8b7576d4f0
+      with:
+        azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
+        azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
+        azure-devops-token: ${{ inputs.azure_devops_pat }}
+        azure-pipeline-variables: '{"system.debug": "true"}'
+        azure-template-parameters: ${{ inputs.azure_template_parameters }}
