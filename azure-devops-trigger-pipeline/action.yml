@@ -120,6 +120,12 @@ runs:
             project_url = os.environ['INPUT_AZURE_DEVOPS_PROJECT_URL']
             pipeline_name = os.environ['INPUT_AZURE_DEVOPS_PIPELINE_NAME']
             pat = os.environ['INPUT_AZURE_DEVOPS_PAT']
+
+            # Validate PAT token
+            if not pat or pat.isspace():
+                log_error("Azure DevOps PAT token cannot be empty or null")
+                sys.exit(1)
+            
             template_params = json.loads(os.environ['INPUT_AZURE_TEMPLATE_PARAMETERS'])
 
             # Create auth header
