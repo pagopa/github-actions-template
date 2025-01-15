@@ -1,5 +1,5 @@
-name: Payments Release
-description: Payments Release
+name: 🚀 Payments Release
+description: 🚀 Payments Release + Docker image
 
 inputs:
   current_branch:
