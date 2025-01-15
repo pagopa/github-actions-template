@@ -1,51 +1,33 @@
-# payments-flow-release
+# azure-devops-trigger-pipeline
 
-Allows to make a release and build docker image with the follow tags:
+This action helps to triggers an Azure DevOps pipeline.
 
-- develop-vX.Y.Z
-- uat-vX.Y.Z
-- vX.Y.Z
+## Azure PAT
+
+the PAT which is personal to a user (we still can't have a bot) and must have the following permissions:
+
+* build: read & execute
+* code: read
+* release: read
 
 ## how to use
 
 ```yaml
-name: 🚀 Payments release
-
-on:
-  push:
-    branches:
-      - develop
-      - uat
-      - main
-    paths-ignore:
-      - 'CODEOWNERS'
-      - '**.md'
-      - '.**'
-  workflow_dispatch:
-
-jobs:
-  payments-flow-release:
+  azure-devops-trigger:
+    name: 🅰️ Azure DevOps Pipeline Trigger
+    needs: payments-flow-release
     runs-on: ubuntu-22.04
-    environment: dev
     steps:
-      - name: 🔖 Checkout code
-        # https://github.com/actions/checkout/releases/tag/v4.2.1
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+      - name: Trigger Azure DevOps Pipeline
+        uses: pagopa/github-actions-template/azure-devops-trigger-pipeline@new-azdo-trigger-pipeline
         with:
-          ref: ${{ github.ref_name }}
-
-      - name: 🚀 release + docker + azdo
-        # https://github.com/pagopa/github-actions-template/releases/tag/v1.16.0
-        uses: pagopa/github-actions-template/payments-flow-release@payments-release
-        with:
-          current_branch: ${{ github.ref_name }}
           enable_azure_devops_step: 'true'
-          azure_devops_project_url: 'https://dev.azure.com/pagopaspa/devopslab-projects'
-          azure_devops_pipeline_name: 'devopslab-diego-deploy.deploy'
-          azure_devops_pat: ${{ secrets.AZUREDEVOPS_PAT }}
+          azure_devops_project_url: 'https://dev.azure.com/pagopaspa/p4pa-projects'
+          azure_devops_pipeline_name: 'p4pa-payhub-deploy-aks.deploy'
+          azure_devops_pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
           azure_template_parameters: |
             {
-              "APPS": "[one-color]",
+              "APPS_TOP": "[p4pa-auth]",
               "POSTMAN_BRANCH": "${{ github.ref_name }}"
             }
 ```

@@ -1,5 +1,5 @@
-name: 🎯 Azure Devops pipeline trigger
-description: Azure Devops pipeline trigger
+name: 🅰️ Azure Devops pipeline trigger
+description: 🅰️ Azure Devops pipeline trigger
 
 inputs:
   enable_azure_devops_step:
