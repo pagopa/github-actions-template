@@ -1,0 +1,6 @@
+{
+  "APPS_TOP": "[one-color]",
+  "ARGOCD_TARGET_BRANCH": "tmp",
+  "POSTMAN_BRANCH": "develop1",
+  "TRIGGER_MESSAGE": "p4pa-auth"
+}

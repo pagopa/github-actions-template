@@ -12,6 +12,8 @@ the PAT which is personal to a user (we still can't have a bot) and must have th
 
 ## how to use
 
+* `azure_template_parameters` is a json string that will be passed to the Azure DevOps pipeline as parameters.
+
 ```yaml
   azure-devops-trigger:
     name: 🅰️ Azure DevOps Pipeline Trigger

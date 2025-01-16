@@ -1,45 +1,160 @@
-name: 🅰️ Azure Devops pipeline trigger
-description: 🅰️ Azure Devops pipeline trigger
-
+# action.yml
+name: 'Azure DevOps Pipeline Trigger'
+description: 'Triggers an Azure DevOps pipeline with template parameters'
 inputs:
   enable_azure_devops_step:
-    description: Are azure devops triggers enabled?
-    default: "false"
+    description: 'Enable or disable the Azure DevOps step'
+    required: true
+    default: 'true'
   azure_devops_project_url:
-    description: Azure devops project url like (e.g. `https://dev.azure.com/pagopaspa/arc-projects``)
+    description: 'Azure DevOps project URL'
+    required: true
   azure_devops_pipeline_name:
-    description: Pipeline name inside the project (e.g. `arc-cittadini-deploy-aks.deploy`)
+    description: 'Name of the Azure DevOps pipeline to trigger'
+    required: true
   azure_devops_pat:
-    description: Personal secret azure devops PAT
-    default: ''
+    description: 'Azure DevOps Personal Access Token'
+    required: true
   azure_template_parameters:
-    description: Json attribute with all the parameters that must be send to the pipeline. See README for example (⚠️ this parameters must exists)
+    description: 'Template parameters in JSON format'
+    required: false
+    default: '{}'
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
-
-    #
-    # AZDO
-    #
-    - name: 🤔 Check azure_devops_pat
-      if: ${{ inputs.enable_azure_devops_step == 'true' }}
-      shell: bash
-      run: |
-        if [ -z "${{ inputs.azure_devops_pat }}" ]; then
-          echo "Error: azure_devops_pat is empty. This is required for triggering the Azure DevOps pipeline."
-          exit 1
-        fi
-
-        echo "🔨 Start launch trigger with Azure Devops"
-
-    - name: 🚂 Trigger Azure DevOps pipeline
-      if: inputs.enable_azure_devops_step == 'true'
-      # https://github.com/pagopa/azure-pipelines/releases/tag/v2.0.0
-      uses: pagopa/azure-pipelines@51d971651241601a348e4e2ed2431b8b7576d4f0
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        azure-devops-project-url: ${{ inputs.azure_devops_project_url }}
-        azure-pipeline-name: ${{ inputs.azure_devops_pipeline_name }}
-        azure-devops-token: ${{ inputs.azure_devops_pat }}
-        azure-pipeline-variables: '{"system.debug": "true"}'
-        azure-template-parameters: ${{ inputs.azure_template_parameters }}
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      shell: bash
+      run: pip install requests
+
+    - name: Run Pipeline Trigger
+      shell: python
+      env:
+        INPUT_ENABLE_AZURE_DEVOPS_STEP: ${{ inputs.enable_azure_devops_step }}
+        INPUT_AZURE_DEVOPS_PROJECT_URL: ${{ inputs.azure_devops_project_url }}
+        INPUT_AZURE_DEVOPS_PIPELINE_NAME: ${{ inputs.azure_devops_pipeline_name }}
+        INPUT_AZURE_DEVOPS_PAT: ${{ inputs.azure_devops_pat }}
+        INPUT_AZURE_TEMPLATE_PARAMETERS: ${{ inputs.azure_template_parameters }}
+      run: |
+        import os
+        import json
+        import sys
+        from urllib.parse import urlparse
+        import requests
+        import base64
+        
+        def log_info(message): print(f"ℹ️ {message}")
+        def log_success(message): print(f"✅ {message}")
+        def log_warning(message): print(f"⚠️ {message}")
+        def log_error(message): print(f"❌ {message}")
+        def log_start(message): print(f"🚀 {message}")
+        def log_config(message): print(f"⚙️ {message}")
+        def log_api(message): print(f"🔌 {message}")
+
+        def get_project_info(project_url):
+            """Extract organization and project from Azure DevOps URL"""
+            log_info(f"Parsing project URL: {project_url}")
+            parts = urlparse(project_url).path.strip('/').split('/')
+            org, project = parts[0], parts[1]
+            log_success(f"Found organization: {org} and project: {project}")
+            return org, project
+
+        def get_pipeline_id(org, project, pipeline_name, auth_header):
+            """Get pipeline ID from name"""
+            log_api(f"Getting pipeline ID for: {pipeline_name}")
+            url = f"https://dev.azure.com/{org}/{project}/_apis/pipelines?api-version=7.1"
+            
+            response = requests.get(url, headers=auth_header)
+            if response.status_code != 200:
+                log_error(f"Failed to get pipeline list: {response.text}")
+                sys.exit(1)
+                
+            pipelines = response.json()['value']
+            for pipeline in pipelines:
+                if pipeline['name'] == pipeline_name:
+                    log_success(f"Found pipeline ID: {pipeline['id']}")
+                    return pipeline['id']
+                    
+            log_error(f"Pipeline {pipeline_name} not found")
+            sys.exit(1)
+
+        def trigger_pipeline(org, project, pipeline_id, template_params, auth_header):
+            """Trigger the pipeline with template parameters"""
+            log_start("Triggering pipeline...")
+            url = f"https://dev.azure.com/{org}/{project}/_apis/pipelines/{pipeline_id}/runs?api-version=7.1"
+            
+            # Pretty print template parameters for logging
+            log_config("Template parameters:")
+            print(json.dumps(template_params, indent=2))
+            
+            body = {
+                "templateParameters": template_params,
+                "resources": {
+                    "repositories": {
+                        "self": {
+                            "refName": "refs/heads/main"
+                        }
+                    }
+                }
+            }
+            
+            log_api("Making API request to Azure DevOps...")
+            response = requests.post(url, headers=auth_header, json=body)
+            return response
+
+        # Main execution
+        log_start("Starting Azure DevOps Pipeline Trigger")
+
+        # Check if step is enabled
+        if os.environ['INPUT_ENABLE_AZURE_DEVOPS_STEP'].lower() != 'true':
+            log_warning("Step is disabled. Skipping...")
+            sys.exit(0)
+
+        try:
+            # Get inputs
+            project_url = os.environ['INPUT_AZURE_DEVOPS_PROJECT_URL']
+            pipeline_name = os.environ['INPUT_AZURE_DEVOPS_PIPELINE_NAME']
+            pat = os.environ['INPUT_AZURE_DEVOPS_PAT']
+
+            # Validate PAT token
+            if not pat or pat.isspace():
+                log_error("Azure DevOps PAT token cannot be empty or null")
+                sys.exit(1)
+            
+            template_params = json.loads(os.environ['INPUT_AZURE_TEMPLATE_PARAMETERS'])
+
+            # Create auth header
+            auth_token = base64.b64encode(f":{pat}".encode()).decode()
+            auth_header = {
+                "Authorization": f"Basic {auth_token}",
+                "Content-Type": "application/json"
+            }
+            log_config("Authentication configured")
+
+            # Get organization and project
+            org, project = get_project_info(project_url)
+
+            # Get pipeline ID
+            pipeline_id = get_pipeline_id(org, project, pipeline_name, auth_header)
+
+            # Trigger pipeline
+            response = trigger_pipeline(org, project, pipeline_id, template_params, auth_header)
+
+            if response.status_code == 200:
+                log_success("Pipeline triggered successfully! 🎉")
+                print("\nPipeline details:")
+                print(json.dumps(response.json(), indent=2))
+            else:
+                log_error(f"Failed to trigger pipeline: {response.text}")
+                sys.exit(1)
+
+        except Exception as e:
+            log_error(f"An error occurred: {str(e)}")
+            sys.exit(1)
+
+        log_success("Pipeline trigger completed successfully! 🏁")
