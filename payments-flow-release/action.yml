@@ -5,6 +5,10 @@ inputs:
   current_branch:
     description: Branch used to launch the action
     required: true
+  github_pat:
+    description: Personal GitHub token for packages
+    required: false
+    default: ''
   docker_build: 
     description: Docker build
     required: false
@@ -31,11 +35,22 @@ runs:
           echo "TAG_FORMAT=v\${version}" >> $GITHUB_OUTPUT
         fi
 
+    # Set the appropriate token
+    - name: 🔐 Set GitHub Token
+      id: set_token
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.github_pat }}" ]; then
+          echo "GITHUB_AUTH_TOKEN=${{ inputs.github_pat }}" >> $GITHUB_OUTPUT
+        else
+          echo "GITHUB_AUTH_TOKEN=${{ github.token }}" >> $GITHUB_OUTPUT
+        fi
+
     - name: 🚀 Release
       id: release
       uses: pagopa/eng-github-actions-iac-template/global/release-action@main
       with:
-        github_token: ${{ github.token }}
+        github_token: ${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
         tag_format: ${{ steps.set-tag-format.outputs.TAG_FORMAT }}
         branches: ${{ github.ref_name }}
 
@@ -65,7 +80,7 @@ runs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ github.token }}
+        password: ${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
 
     - name: 📦 Build and push Docker image with release version
       id: docker_build_push
@@ -76,3 +91,5 @@ runs:
         push: true
         tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
         labels: ${{ inputs.docker_labels }}
+        build-args: |
+          GITHUB_TOKEN=${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}

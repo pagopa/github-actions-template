@@ -8,6 +8,10 @@ Allows to make a release and build a docker image with the follow tags:
 
 ## how to use
 
+- `github_pat`: allow to use your github pat, if not the repository default github token will be used
+
+### Example
+
 ```yaml
 name: 🚀 Flow Release
 
@@ -22,6 +26,10 @@ on:
       - '**.md'
       - '.**'
   workflow_dispatch:
+
+permissions:
+  packages: write
+  contents: write
 
 jobs:
 
