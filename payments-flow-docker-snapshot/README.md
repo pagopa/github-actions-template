@@ -9,6 +9,10 @@ and if runned manually, create a fake tag called `develop-snapshot` + the previo
 
 ## how to use
 
+- `github_pat`: allow to use your github pat, if not the repository default github token will be used
+
+### Example
+
 ```yaml
 name: 📦 Flow Snapshot Docker
 
