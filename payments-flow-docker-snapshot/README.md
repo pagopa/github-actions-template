@@ -41,6 +41,10 @@ on:
           required: false
           default: 'main'
 
+permissions:
+  packages: write
+  contents: read
+
 env:
   # branch choosed by workflow_dispatch or by push event
   CURRENT_BRANCH: ${{ github.event.inputs.branch || github.ref_name }}

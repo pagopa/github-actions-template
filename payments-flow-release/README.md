@@ -27,6 +27,10 @@ on:
       - '.**'
   workflow_dispatch:
 
+permissions:
+  packages: write
+  contents: write
+
 jobs:
 
   checkout:
