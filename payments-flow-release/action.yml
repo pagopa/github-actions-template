@@ -41,16 +41,16 @@ runs:
       shell: bash
       run: |
         if [ -n "${{ inputs.github_pat }}" ]; then
-          echo "GITHUB_AUTH_TOKEN=${{ inputs.github_pat }}" >> $GITHUB_OUTPUT
+          echo "GIT_AUTH_TOKEN=${{ inputs.github_pat }}" >> $GITHUB_OUTPUT
         else
-          echo "GITHUB_AUTH_TOKEN=${{ github.token }}" >> $GITHUB_OUTPUT
+          echo "GIT_AUTH_TOKEN=${{ github.token }}" >> $GITHUB_OUTPUT
         fi
 
     - name: 🚀 Release
       id: release
       uses: pagopa/eng-github-actions-iac-template/global/release-action@main
       with:
-        github_token: ${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
+        github_token: ${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
         tag_format: ${{ steps.set-tag-format.outputs.TAG_FORMAT }}
         branches: ${{ github.ref_name }}
 
@@ -76,20 +76,23 @@ runs:
     - name: 🛃 Log in to the Github Container registry
       id: docker_login
       if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
-      uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
+      # https://github.com/docker/login-action/releases/tag/v3.6.0
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
+        password: ${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
 
     - name: 📦 Build and push Docker image with release version
       id: docker_build_push
       if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
-      uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c #v6.3.0
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
         push: true
         tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
         labels: ${{ inputs.docker_labels }}
         build-args: |
-          GITHUB_TOKEN=${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
+          GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
+        secrets: |
+          GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
