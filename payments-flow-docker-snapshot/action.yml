@@ -16,6 +16,7 @@ inputs:
       maintainer=https://pagopa.it
       org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
+
 runs:
   using: "composite"
   steps:
@@ -33,7 +34,8 @@ runs:
           fi
 
       - name: 🛃 Log in to the Github Container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
+        # https://github.com/docker/login-action/releases/tag/v3.6.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
