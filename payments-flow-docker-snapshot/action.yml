@@ -25,8 +25,10 @@ runs:
         shell: bash
         run: |
           if [ -n "${{ inputs.github_pat }}" ]; then
+            echo "ℹ️ Using personal GitHub PAT token"
             echo "GITHUB_AUTH_TOKEN=${{ inputs.github_pat }}" >> $GITHUB_OUTPUT
           else
+            echo "ℹ️ Using default GitHub token"
             echo "GITHUB_AUTH_TOKEN=${{ github.token }}" >> $GITHUB_OUTPUT
           fi
 
@@ -54,5 +56,6 @@ runs:
           push: true
           tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
           labels: ${{ inputs.docker_labels }}
+          platforms: linux/amd64
           build-args: GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
           secrets: GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GITHUB_AUTH_TOKEN }}
