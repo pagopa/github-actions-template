@@ -35,6 +35,11 @@ inputs:
     type: boolean
     description: True to create only the Tag without the Release
     default: false
+  package_path:
+    required: false
+    type: string
+    description: Path to package.json file
+    default: "."
 
 
 outputs:
@@ -70,9 +75,9 @@ runs:
     - id: get_version
       name: Get Version
       run: |
-        PACKAGE_FILE="package.json"
+        PACKAGE_FILE="${{ inputs.package_path }}/package.json"
         if [[ -f "$PACKAGE_FILE" ]]; then
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "version=$(node -p "require('${{ inputs.package_path }}/package.json').version")" >> $GITHUB_ENV
         fi
       shell: bash
 
@@ -101,7 +106,7 @@ runs:
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
       run: |
-        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' package.json)"
+        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' ${{ inputs.package_path }}/package.json)"
         echo -E "${contents}" > package.json
   
         git add .
