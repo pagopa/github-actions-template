@@ -74,10 +74,12 @@ runs:
 
     - id: get_version
       name: Get Version
+      env:
+        PACKAGE_PATH: ${{ inputs.package_path }}
       run: |
-        PACKAGE_FILE="${{ inputs.package_path }}package.json"
+        PACKAGE_FILE="${PACKAGE_PATH}package.json"
         if [[ -f "$PACKAGE_FILE" ]]; then
-          echo "version=$(node -p "require('${{ inputs.package_path }}package.json').version")" >> $GITHUB_ENV
+          echo "version=$(node -p "require('${PACKAGE_PATH}package.json').version")" >> $GITHUB_ENV
         fi
       shell: bash
 
