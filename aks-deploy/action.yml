@@ -123,9 +123,12 @@ runs:
     - name: 🗑Remove deployment
       if: ${{ inputs.uninstall == true }}
       shell: bash
+      env:
+        APP_NAME: ${{ inputs.app_name }}
+        NAMESPACE: ${{ inputs.namespace }}
       run: |
         echo "🗑Launch helm uninstall"
-        helm uninstall ${{ inputs.app_name }} -n ${{ inputs.namespace }}
+        helm uninstall "$APP_NAME" -n "$NAMESPACE"
         echo "✔️Helm uninstall"
 
 
