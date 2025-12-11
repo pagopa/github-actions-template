@@ -107,9 +107,11 @@ runs:
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
+      env:
+        PACKAGE_PATH: ${{ inputs.package_path }}
       run: |
-        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' ${{ inputs.package_path }}package.json)"
-        echo -E "${contents}" > ${{ inputs.package_path }}package.json
+        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' ${PACKAGE_PATH}package.json)"
+        echo -E "${contents}" > ${PACKAGE_PATH}package.json
   
         git add .
         git config --global user.email "github-bot@pagopa.it"
