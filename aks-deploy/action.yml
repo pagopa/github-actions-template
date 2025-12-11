@@ -107,7 +107,7 @@ runs:
 
     - name: 🚀 Helm Deploy
       shell: bash
-      if: ${{ inputs.uninstall == false }}
+      if: ${{ inputs.uninstall == 'false' }}
       working-directory: ${{ env.working_dir }}
       run: |
         echo "🚀 Launch helm deploy"
@@ -121,7 +121,7 @@ runs:
         echo "✅ Helm deployed"
 
     - name: 🗑Remove deployment
-      if: ${{ inputs.uninstall == true }}
+      if: ${{ inputs.uninstall == 'true' }}
       shell: bash
       env:
         APP_NAME: ${{ inputs.app_name }}
@@ -130,10 +130,3 @@ runs:
         echo "🗑Launch helm uninstall"
         helm uninstall "$APP_NAME" -n "$NAMESPACE"
         echo "✔️Helm uninstall"
-
-
-
-
-
-
-
