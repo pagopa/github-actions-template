@@ -35,6 +35,11 @@ inputs:
     type: boolean
     description: True to create only the Tag without the Release
     default: false
+  package_path:
+    required: false
+    type: string
+    description: Path leading to package.json file
+    default: "./"
 
 
 outputs:
@@ -69,10 +74,12 @@ runs:
 
     - id: get_version
       name: Get Version
+      env:
+        PACKAGE_PATH: ${{ inputs.package_path }}
       run: |
-        PACKAGE_FILE="package.json"
+        PACKAGE_FILE="${PACKAGE_PATH}package.json"
         if [[ -f "$PACKAGE_FILE" ]]; then
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "version=$(node -p "require('${PACKAGE_PATH}package.json').version")" >> $GITHUB_ENV
         fi
       shell: bash
 
@@ -100,9 +107,11 @@ runs:
     - name: Push New Version
       if: ${{ inputs.semver != 'skip' }}
       shell: bash
+      env:
+        PACKAGE_PATH: ${{ inputs.package_path }}
       run: |
-        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' package.json)"
-        echo -E "${contents}" > package.json
+        contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' ${PACKAGE_PATH}package.json)"
+        echo -E "${contents}" > ${PACKAGE_PATH}package.json
   
         git add .
         git config --global user.email "github-bot@pagopa.it"
