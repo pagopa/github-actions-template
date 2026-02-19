@@ -84,6 +84,12 @@ runs:
       key: ${{ runner.os }}-sonar-project.properties
       restore-keys: ${{ runner.os }}-sonar-project.properties
 
+  - name: Prepare Docker Environment
+    shell: bash
+    run: |
+        echo "DOCKER_HOST=unix:///var/run/docker.sock" >> $GITHUB_ENV
+        echo "DOCKER_API_VERSION=1.44" >> $GITHUB_ENV
+
   - name: Build and analyze on Pull Requests
     if: ${{ github.event_name == 'pull_request' }}
     shell: bash
@@ -99,6 +105,9 @@ runs:
       -Dsonar.pullrequest.branch=${{ github.head_ref }}
       -Dsonar.pullrequest.base=${{ github.base_ref }}
       -Dorg.testcontainers.dockerclient.DockerClientProviderStrategy.api.version=${{ inputs.docker_api_version }}
+      -Dorg.testcontainers.dockerclient.DockerClientProviderStrategy.api.version=${{ inputs.docker_api_version }}
+      -Dtestcontainers.reuse.enable=true
+      -Ddocker.client.strategy=org.testcontainers.dockerclient.UnixSocketClientProviderStrategy
     env:
       # Needed to get some information about the pull request, if any
       GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -126,4 +135,6 @@ runs:
       -Dsonar.host.url=https://sonarcloud.io
       -Dsonar.login=${{ inputs.sonar_token }}
       -Dorg.testcontainers.dockerclient.DockerClientProviderStrategy.api.version=${{ inputs.docker_api_version }}
+      -Dtestcontainers.reuse.enable=true
+      -Ddocker.client.strategy=org.testcontainers.dockerclient.UnixSocketClientProviderStrategy
 
