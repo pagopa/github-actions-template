@@ -104,6 +104,9 @@ runs:
       GITHUB_TOKEN: ${{ inputs.github_token }}
       # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
       SONAR_TOKEN: ${{ inputs.sonar_token }}
+      DOCKER_HOST: "unix:///var/run/docker.sock"
+      DOCKER_API_VERSION: ${{ inputs.docker_api_version }}
+
 
   - name: Build and analyze on Push main
     if: ${{ github.event_name != 'pull_request' }}
@@ -111,6 +114,8 @@ runs:
     env:
       GITHUB_TOKEN: ${{ inputs.github_token }}
       SONAR_TOKEN: ${{ inputs.sonar_token }}
+      DOCKER_HOST: "unix:///var/run/docker.sock"
+      DOCKER_API_VERSION: ${{ inputs.docker_api_version }}
     run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       -Dsonar.organization=pagopa
       -Dsonar.projectKey=${{ env.PROJECT_KEY }}
