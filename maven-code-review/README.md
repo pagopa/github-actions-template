@@ -21,6 +21,7 @@ pom.xml to calculate the coverage.
     cpd_exclusions: "**/model/**,**/entity/*"
     java_distribution: 'zulu'
     java_version: '11'
+    docker_api_version: '1.44'
       
 ```
 
@@ -35,7 +36,7 @@ pom.xml to calculate the coverage.
 | cpd_exclusions      | Files to exclude from code duplication | false    | `string` | **/model/**,**/entity/*"                        |
 | java_distribution   | Distribution of JDK                    | false    | `string` | zulu                                            |
 | java_version        | Version of JDK                         | false    | `string` | 11                                              |
-
+| docker_api_version  | API Docker version                     | false    | `string` | 1.44                                            |
 
 ## Output
 
