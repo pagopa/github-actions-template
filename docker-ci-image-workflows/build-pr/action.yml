@@ -1,0 +1,110 @@
+name: 'Docker Golden Image: Build PR Image'
+description: 'Builds and pushes a Docker image for a Pull Request and comments on the PR with tags.'
+
+inputs:
+  dockerfile_path:
+    description: 'Path to Dockerfile'
+    required: false
+    default: './Dockerfile'
+  docker_context:
+    description: 'Docker build context path'
+    required: false
+    default: '.'
+  registry:
+    description: 'Container registry URL'
+    required: false
+    default: 'ghcr.io'
+  image_name:
+    description: 'Image name (defaults to repository name)'
+    required: false
+    default: ''
+  build_args:
+    description: 'Docker build arguments (comma-separated KEY=VALUE pairs)'
+    required: false
+    default: ''
+  platforms:
+    description: 'Target platforms for build'
+    required: false
+    default: 'linux/amd64'
+  registry_username:
+    description: 'Registry username'
+    required: false
+  registry_password:
+    description: 'Registry password'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set image name
+      id: image
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.image_name }}" ]; then
+          echo "name=${{ github.repository }}" >> $GITHUB_OUTPUT
+        else
+          echo "name=${{ inputs.image_name }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ inputs.registry_username || github.actor }}
+        password: ${{ inputs.registry_password }}
+
+    - name: Parse build args
+      id: build-args
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.build_args }}" ]; then
+          echo "args<<EOF" >> $GITHUB_OUTPUT
+          echo "${{ inputs.build_args }}" | tr ',' '\n' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "args=" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ inputs.registry }}/${{ steps.image.outputs.name }}
+        tags: |
+          type=ref,event=pr,prefix=pr-
+          type=sha,prefix=pr-{{branch}}-
+
+    - name: Build and push PR image
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ inputs.docker_context }}
+        file: ${{ inputs.dockerfile_path }}
+        platforms: ${{ inputs.platforms }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: ${{ steps.build-args.outputs.args }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Comment PR with image tags
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const tags = `${{ steps.meta.outputs.tags }}`.split('\n');
+          const comment = `### 🐳 Docker Image Built Successfully\n\n` +
+            `**Image Tags:**\n${tags.map(tag => `- \`${tag}\``).join('\n')}\n\n` +
+            `**Pull command:**\n\`\`\`bash\ndocker pull ${tags[0]}\n\`\`\``;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
