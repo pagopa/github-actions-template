@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
-# Lints an OpenAPI spec with Spectral and gates the job on the number of findings.
+# Lints an OpenAPI spec with Spectral and gates the job on the severity of the findings.
 # Inputs arrive as environment variables, see action.yml.
 set -euo pipefail
 
 : "${SPEC_PATH:?SPEC_PATH is required}"
-: "${MAX_ERRORS:?MAX_ERRORS is required}"
-: "${MAX_WARNINGS:?MAX_WARNINGS is required}"
+: "${FAIL_SEVERITY:?FAIL_SEVERITY is required}"
 : "${FAIL_ON_VIOLATION:?FAIL_ON_VIOLATION is required}"
+
+# Spectral's own severity numbering, as it appears in the JSON report.
+case "$FAIL_SEVERITY" in
+  error) FAIL_LEVEL=0 ;;
+  warn)  FAIL_LEVEL=1 ;;
+  info)  FAIL_LEVEL=2 ;;
+  *)
+    echo "::error::fail_severity must be error, warn or info, got '${FAIL_SEVERITY}'"
+    exit 1
+    ;;
+esac
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -46,9 +56,17 @@ fi
 count_severity() {
   jq --argjson s "$1" '[.[] | select(.severity == $s)] | length' "$OUT"
 }
+blocking() {
+  if [ "$1" -le "$FAIL_LEVEL" ]; then echo "yes"; else echo "no"; fi
+}
 ERRORS=$(count_severity 0)
 WARNINGS=$(count_severity 1)
 INFOS=$(count_severity 2)
+
+# The gate is computed here rather than delegated to Spectral's own --fail-severity,
+# because report-only mode would then need to swallow Spectral's exit code and that is
+# what reopens the exit 2 hole above.
+BLOCKING=$(jq --argjson l "$FAIL_LEVEL" '[.[] | select(.severity <= $l)] | length' "$OUT")
 
 # Annotations for errors and warnings only. GitHub renders at most 10 annotations per
 # type per step, so annotating info findings too would bury the ones worth acting on.
@@ -59,17 +77,17 @@ jq -r --arg f "$SPEC_PATH" '
   | "::\(if .severity == 0 then "error" else "warning" end) title=\(.code),file=\($f),line=\(.range.start.line + 1),endLine=\(.range.end.line + 1),col=\(.range.start.character + 1)::\(.message | gsub("\n"; " "))"
 ' "$OUT"
 
-echo "${SPEC_PATH}: ${ERRORS} error(s) of max ${MAX_ERRORS}, ${WARNINGS} warning(s) of max ${MAX_WARNINGS}, ${INFOS} info"
+echo "${SPEC_PATH}: ${ERRORS} error(s), ${WARNINGS} warning(s), ${INFOS} info; ${BLOCKING} at or above ${FAIL_SEVERITY}"
 
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {
     echo "### OpenAPI lint: \`${SPEC_PATH}\`"
     echo ""
-    echo "| Severity | Findings | Threshold |"
+    echo "| Severity | Findings | Blocking |"
     echo "| --- | --- | --- |"
-    echo "| Error | ${ERRORS} | ${MAX_ERRORS} |"
-    echo "| Warning | ${WARNINGS} | ${MAX_WARNINGS} |"
-    echo "| Info | ${INFOS} | not gated |"
+    echo "| Error | ${ERRORS} | $(blocking 0) |"
+    echo "| Warning | ${WARNINGS} | $(blocking 1) |"
+    echo "| Info | ${INFOS} | $(blocking 2) |"
     if [ "$INFOS" -gt 0 ]; then
       echo ""
       echo "<details><summary>Info findings by rule</summary>"
@@ -97,22 +115,15 @@ if [ "$FAIL_ON_VIOLATION" != "true" ]; then
   GATE_LEVEL="warning"
 fi
 
-VIOLATION=0
-if [ "$ERRORS" -gt "$MAX_ERRORS" ]; then
-  echo "::${GATE_LEVEL} file=${SPEC_PATH}::${ERRORS} errors exceed the maximum of ${MAX_ERRORS}"
-  VIOLATION=1
-fi
-if [ "$WARNINGS" -gt "$MAX_WARNINGS" ]; then
-  echo "::${GATE_LEVEL} file=${SPEC_PATH}::${WARNINGS} warnings exceed the maximum of ${MAX_WARNINGS}"
-  VIOLATION=1
-fi
-
-if [ "$VIOLATION" -eq 0 ]; then
+if [ "$BLOCKING" -eq 0 ]; then
   exit 0
 fi
+
+echo "::${GATE_LEVEL} file=${SPEC_PATH}::${BLOCKING} finding(s) at or above severity ${FAIL_SEVERITY}"
+
 if [ "$FAIL_ON_VIOLATION" = "true" ]; then
   exit 1
 fi
 
-echo "Thresholds exceeded, not failing the job because fail_on_violation is false"
+echo "Findings at or above ${FAIL_SEVERITY}, not failing the job because fail_on_violation is false"
 exit 0

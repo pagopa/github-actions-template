@@ -1,5 +1,5 @@
 name: OpenAPI lint
-description: "Lint an OpenAPI spec with Spectral and fail the job when findings exceed the given thresholds"
+description: "Lint an OpenAPI spec with Spectral and fail the job on findings at or above a severity"
 
 inputs:
   spec_path:
@@ -11,22 +11,21 @@ inputs:
     type: string
     default: ''
     description: Path to a Spectral ruleset in the calling repository. Empty means the ruleset bundled with this action
-  max_errors:
+  fail_severity:
     required: false
-    type: number
-    default: 0
-    description: Maximum number of error findings tolerated before the job fails
-  max_warnings:
-    required: false
-    type: number
-    default: 0
-    description: Maximum number of warning findings tolerated before the job fails
+    type: string
+    default: "warn"
+    description: >
+      Lowest severity that fails the job: error, warn or info. Findings below it are
+      reported but never block. A rule too noisy to block on is downgraded by name in
+      the ruleset, where the exception is visible in review, rather than absorbed by a
+      numeric budget that hides findings by count and only ever grows.
   fail_on_violation:
     required: false
     type: boolean
     default: true
     description: >
-      Fail the job when a threshold is exceeded. Set to false to run in report-only mode.
+      Fail the job on a blocking finding. Set to false to run in report-only mode.
       A lint that cannot run at all fails the job regardless, since it is a configuration
       error rather than a finding.
   spectral_version:
@@ -69,7 +68,6 @@ runs:
         ACTION_PATH: ${{ github.action_path }}
         SPEC_PATH: ${{ inputs.spec_path }}
         RULESET: ${{ inputs.ruleset }}
-        MAX_ERRORS: ${{ inputs.max_errors }}
-        MAX_WARNINGS: ${{ inputs.max_warnings }}
+        FAIL_SEVERITY: ${{ inputs.fail_severity }}
         FAIL_ON_VIOLATION: ${{ inputs.fail_on_violation }}
       run: bash "${ACTION_PATH}/openapi-lint.sh"

@@ -1,6 +1,8 @@
 # Shared OpenAPI ruleset for the eCommerce, Wallet and Checkout domains.
 # A repository that needs different rules commits its own and passes it as `ruleset`.
-# The gate fails on errors and warnings: info is reported but never blocks a pull request.
+# Severity is the gate: a rule that should not block a pull request is downgraded here by
+# name and with its reason, rather than absorbed by a numeric threshold. Errors and
+# warnings block by default (fail_severity), info is reported but never does.
 extends:
   - [spectral:oas, recommended]          # base OpenAPI rules
   - "@stoplight/spectral-owasp-ruleset"  # OWASP rules, not bundled with Spectral

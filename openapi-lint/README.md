@@ -36,9 +36,8 @@ The spec matrix stays in the calling workflow, because the number of specs diffe
 |-----------------------|----------------------------------------------------------|----------|---------------------------------------------------|---------|
 | spec_path             | OpenAPI spec to lint, relative to the repository root     | **true** | `string`                                          |         |
 | ruleset               | Spectral ruleset in the calling repository                | false    | `string`: empty means the bundled ruleset         |         |
-| max_errors            | Error findings tolerated before the check fails           | false    | `number`                                          | 0       |
-| max_warnings          | Warning findings tolerated before the check fails         | false    | `number`                                          | 0       |
-| fail_on_violation     | Whether exceeding a threshold fails the check             | false    | `boolean`                                         | true    |
+| fail_severity         | Lowest severity that fails the check                      | false    | `error` \| `warn` \| `info`                        | warn    |
+| fail_on_violation     | Whether a blocking finding fails the check                | false    | `boolean`                                         | true    |
 | spectral_version      | Version of `@stoplight/spectral-cli`                      | false    | `string`                                          | 6.16.3  |
 | owasp_ruleset_version | Version of `@stoplight/spectral-owasp-ruleset`            | false    | `string`                                          | 2.0.1   |
 
@@ -49,6 +48,8 @@ None. The result is the exit status of the check, the annotations on the pull re
 ## Behaviour worth knowing
 
 **A lint that cannot run fails the check, in report-only mode too.** Spectral exits `1` when it finds results but `2` or more when it could not run at all, and in that case it writes no report. A gate that does not tell the two apart passes silently and stops protecting anything. An unloadable ruleset is a configuration error, not a finding, so `fail_on_violation: false` does not suppress it.
+
+**Noise is handled by severity, not by a budget.** There is deliberately no `max_warnings`. A rule too noisy to block on is downgraded by name in the ruleset, with its reason, so the exception is visible in review; a numeric budget hides findings by count and, as the Rate My OpenAPI rollout showed, only ever grows. A repository still working through its warnings migrates with `fail_severity: error` and tightens to `warn` once its spec is clean, which is a one-line change visible in the diff.
 
 **Only errors and warnings are annotated on the pull request.** GitHub renders at most 10 annotations per type per step, so annotating info findings as well would push the actionable ones out of view. Info findings are reported as counts, broken down by rule, in the job summary.
 
