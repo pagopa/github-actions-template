@@ -4,70 +4,48 @@ description: "Lint an OpenAPI spec with Spectral and fail the job on findings at
 inputs:
   spec_path:
     required: true
-    type: string
     description: Path to the OpenAPI spec to lint, relative to the repository root
   ruleset:
     required: false
-    type: string
     default: ''
-    description: Path to a Spectral ruleset in the calling repository. Empty means the ruleset bundled with this action
+    description: >
+      Path to a Spectral ruleset in the calling repository. Empty means the ruleset
+      bundled with this action.
   fail_severity:
     required: false
-    type: string
     default: "warn"
     description: >
       Lowest severity that fails the job: error, warn or info. Findings below it are
-      reported but never block. A rule too noisy to block on is downgraded by name in
-      the ruleset, where the exception is visible in review, rather than absorbed by a
-      numeric budget that hides findings by count and only ever grows.
+      reported but never block. Downgrade a noisy rule by name in the ruleset, not here.
   fail_on_violation:
     required: false
-    type: boolean
-    default: true
+    default: "true"
     description: >
-      Fail the job on a blocking finding. Set to false to run in report-only mode.
-      A lint that cannot run at all fails the job regardless, since it is a configuration
-      error rather than a finding.
+      Fail the job on blocking findings. Set to false for report-only. A lint that cannot
+      run fails regardless: that is a configuration error, not a finding.
   spectral_version:
     required: false
-    type: string
     default: "6.16.3"
     description: Version of @stoplight/spectral-cli to install
   owasp_ruleset_version:
     required: false
-    type: string
     default: "2.0.1"
     description: Version of @stoplight/spectral-owasp-ruleset to install
 
 runs:
   using: "composite"
   steps:
-    - name: Install Spectral and the OWASP ruleset
-      shell: bash
-      env:
-        ACTION_PATH: ${{ github.action_path }}
-        INPUT_RULESET: ${{ inputs.ruleset }}
-        SPECTRAL_VERSION: ${{ inputs.spectral_version }}
-        OWASP_RULESET_VERSION: ${{ inputs.owasp_ruleset_version }}
-      run: |
-        # An empty ruleset input means the calling repository takes the bundled one.
-        RULESET="${INPUT_RULESET:-${ACTION_PATH}/default.spectral.yaml}"
-
-        # Spectral resolves the npm packages a ruleset extends starting from the
-        # directory of the ruleset file, so the install targets that directory. It
-        # creates only a node_modules directory, no package.json and no lock file.
-        npm install --no-save --no-package-lock --prefix "$(dirname "$RULESET")" \
-          "@stoplight/spectral-cli@${SPECTRAL_VERSION}" \
-          "@stoplight/spectral-owasp-ruleset@${OWASP_RULESET_VERSION}"
-
+    # One step on purpose: the script installs Spectral where it reads it from, so no
+    # input-derived path crosses a step boundary through GITHUB_ENV.
     - name: Lint ${{ inputs.spec_path }}
       shell: bash
       env:
-        # Every value reaches the script as an environment variable and none is
-        # interpolated into the script itself, so nothing can be spliced into the shell.
+        # Values reach the script as env vars, never interpolated into the run block.
         ACTION_PATH: ${{ github.action_path }}
         SPEC_PATH: ${{ inputs.spec_path }}
         RULESET: ${{ inputs.ruleset }}
         FAIL_SEVERITY: ${{ inputs.fail_severity }}
         FAIL_ON_VIOLATION: ${{ inputs.fail_on_violation }}
+        SPECTRAL_VERSION: ${{ inputs.spectral_version }}
+        OWASP_RULESET_VERSION: ${{ inputs.owasp_ruleset_version }}
       run: bash "${ACTION_PATH}/openapi-lint.sh"

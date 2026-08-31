@@ -1,6 +1,6 @@
 # OpenAPI lint
 
-This action lints an OpenAPI spec with [Spectral](https://github.com/stoplightio/spectral) and fails the check when the findings exceed the configured thresholds.
+This action lints an OpenAPI spec with [Spectral](https://github.com/stoplightio/spectral) and fails the check on findings at or above a configured severity.
 
 It replaces `zuplo/rmoa-action` (Rate My OpenAPI), which depends on a cloud API key that periodically expires and blocks the pipelines, and which only exposes numeric thresholds, with no way to disable a single rule.
 
@@ -48,6 +48,8 @@ None. The result is the exit status of the check, the annotations on the pull re
 ## Behaviour worth knowing
 
 **A lint that cannot run fails the check, in report-only mode too.** Spectral exits `1` when it finds results but `2` or more when it could not run at all, and in that case it writes no report. A gate that does not tell the two apart passes silently and stops protecting anything. An unloadable ruleset is a configuration error, not a finding, so `fail_on_violation: false` does not suppress it.
+
+Two cases need more than the exit code, since Spectral reports them as ordinary findings: an unrecognised document yields exit `0` and one `unrecognized-format` **warning** having run no rules, and an unparseable spec yields `parser` findings. Both are configuration errors, so neither `fail_severity` nor `fail_on_violation` suppresses them.
 
 **Noise is handled by severity, not by a budget.** There is deliberately no `max_warnings`. A rule too noisy to block on is downgraded by name in the ruleset, with its reason, so the exception is visible in review; a numeric budget hides findings by count and, as the Rate My OpenAPI rollout showed, only ever grows. A repository still working through its warnings migrates with `fail_severity: error` and tightens to `warn` once its spec is clean, which is a one-line change visible in the diff.
 

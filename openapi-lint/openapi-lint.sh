@@ -6,6 +6,8 @@ set -euo pipefail
 : "${SPEC_PATH:?SPEC_PATH is required}"
 : "${FAIL_SEVERITY:?FAIL_SEVERITY is required}"
 : "${FAIL_ON_VIOLATION:?FAIL_ON_VIOLATION is required}"
+: "${SPECTRAL_VERSION:?SPECTRAL_VERSION is required}"
+: "${OWASP_RULESET_VERSION:?OWASP_RULESET_VERSION is required}"
 
 # Spectral's own severity numbering, as it appears in the JSON report.
 case "$FAIL_SEVERITY" in
@@ -18,12 +20,10 @@ case "$FAIL_SEVERITY" in
     ;;
 esac
 
+# An empty ruleset means the calling repository has none of its own and takes the one
+# bundled with this action, which sits next to this script.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# An empty ruleset means the calling repository has no ruleset of its own and takes the
-# one bundled with this action.
 RULESET="${RULESET:-${SCRIPT_DIR}/default.spectral.yaml}"
-SPECTRAL_BIN="${SPECTRAL_BIN:-$(dirname "$RULESET")/node_modules/.bin/spectral}"
 
 if [ ! -f "$SPEC_PATH" ]; then
   echo "::error::OpenAPI spec not found: ${SPEC_PATH}"
@@ -34,15 +34,24 @@ if [ ! -f "$RULESET" ]; then
   exit 1
 fi
 
-echo "Linting ${SPEC_PATH} with ${RULESET}"
+# Spectral resolves a ruleset's npm packages from the ruleset's own directory and these
+# repos have no package.json, so install there and read the binary back from the same path.
+# Never skipped on an existing node_modules: that would lint with an unpinned version.
+PREFIX="$(dirname "$RULESET")"
+SPECTRAL_BIN="${PREFIX}/node_modules/.bin/spectral"
+npm install --no-save --no-package-lock --prefix "$PREFIX" \
+  "@stoplight/spectral-cli@${SPECTRAL_VERSION}" \
+  "@stoplight/spectral-owasp-ruleset@${OWASP_RULESET_VERSION}"
+if [ ! -x "$SPECTRAL_BIN" ]; then
+  echo "::error::Spectral not found at ${SPECTRAL_BIN} after installing it there."
+  exit 1
+fi
 
 OUT="$(mktemp)"
 trap 'rm -f "$OUT"' EXIT
 
-# Spectral exits 0 when it finds nothing above the fail severity, 1 when it has results,
-# and 2 or more when it could not run at all. In that last case it writes no JSON, so a
-# gate that only reads the JSON would pass silently and quietly stop checking anything.
-# Both conditions are therefore verified: the exit code and a non-empty report.
+# Exit 2 or more means Spectral could not run and wrote no JSON. Check both the exit code
+# and a non-empty report, or the gate passes silently and stops checking.
 set +e
 "$SPECTRAL_BIN" lint --ruleset "$RULESET" --format json --output "$OUT" --quiet "$SPEC_PATH"
 RC=$?
@@ -53,24 +62,32 @@ if [ "$RC" -gt 1 ] || [ ! -s "$OUT" ]; then
   exit 1
 fi
 
+# Both mean nothing was linted, yet Spectral reports them as ordinary findings:
+# unrecognized-format runs zero rules and is only a warning, so fail_severity: error
+# would let it through. Configuration errors, so report-only does not suppress them.
+UNLINTABLE=$(jq -r '[.[] | select(.code == "unrecognized-format" or .code == "parser")] | .[0].message // empty' "$OUT")
+if [ -n "$UNLINTABLE" ]; then
+  echo "::error file=${SPEC_PATH}::Spectral could not lint ${SPEC_PATH}: ${UNLINTABLE}. Failing the job rather than reporting a clean run."
+  exit 1
+fi
+
 count_severity() {
   jq --argjson s "$1" '[.[] | select(.severity == $s)] | length' "$OUT"
 }
+# Report-only blocks nothing at any severity, so the summary must not claim otherwise.
 blocking() {
-  if [ "$1" -le "$FAIL_LEVEL" ]; then echo "yes"; else echo "no"; fi
+  if [ "$FAIL_ON_VIOLATION" = "true" ] && [ "$1" -le "$FAIL_LEVEL" ]; then echo "yes"; else echo "no"; fi
 }
 ERRORS=$(count_severity 0)
 WARNINGS=$(count_severity 1)
 INFOS=$(count_severity 2)
 
-# The gate is computed here rather than delegated to Spectral's own --fail-severity,
-# because report-only mode would then need to swallow Spectral's exit code and that is
-# what reopens the exit 2 hole above.
+# Computed here, not delegated to Spectral's --fail-severity: report-only would then have
+# to swallow Spectral's exit code, reopening the exit 2 hole above.
 BLOCKING=$(jq --argjson l "$FAIL_LEVEL" '[.[] | select(.severity <= $l)] | length' "$OUT")
 
-# Annotations for errors and warnings only. GitHub renders at most 10 annotations per
-# type per step, so annotating info findings too would bury the ones worth acting on.
-# The info findings are reported as counts in the job summary instead.
+# Errors and warnings only: GitHub renders at most 10 annotations per type per step, so
+# info findings would bury them. Info goes to the job summary as counts.
 jq -r --arg f "$SPEC_PATH" '
   .[]
   | select(.severity <= 1)
@@ -88,6 +105,10 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     echo "| Error | ${ERRORS} | $(blocking 0) |"
     echo "| Warning | ${WARNINGS} | $(blocking 1) |"
     echo "| Info | ${INFOS} | $(blocking 2) |"
+    if [ "$FAIL_ON_VIOLATION" != "true" ]; then
+      echo ""
+      echo "Report-only: \`fail_on_violation\` is false, so nothing blocks this job."
+    fi
     if [ "$INFOS" -gt 0 ]; then
       echo ""
       echo "<details><summary>Info findings by rule</summary>"
@@ -108,8 +129,7 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   } >> "$GITHUB_STEP_SUMMARY"
 fi
 
-# In report-only mode the threshold messages are warnings, so that a job which is not
-# meant to fail does not display red errors on the pull request.
+# Report-only downgrades the gate message only. Finding annotations keep their severity.
 GATE_LEVEL="error"
 if [ "$FAIL_ON_VIOLATION" != "true" ]; then
   GATE_LEVEL="warning"
