@@ -1,0 +1,31 @@
+# Shared OpenAPI ruleset for that can be used with every repo/domain.
+# A repository that needs different rules commits its own and passes it as `ruleset`.
+# Severity is the gate: a rule that should not block a pull request is downgraded here by
+# name and with its reason, rather than absorbed by a numeric threshold. Errors and
+# warnings block by default (fail_severity), info is reported but never does.
+extends:
+  - [spectral:oas, recommended]          # base OpenAPI rules
+  - "@stoplight/spectral-owasp-ruleset"  # OWASP rules, not bundled with Spectral
+
+rules:
+  # Rate limiting is enforced by APIM, not declared per operation
+  owasp:api4:2023-rate-limit: off
+  owasp:api4:2023-rate-limit-retry-after: off
+  owasp:api4:2023-rate-limit-responses-429: off
+
+  # Unrestricted resource consumption: these fire in the hundreds, largely on shared
+  # standard schemas such as ProblemJson (RFC 7807), where adding maxLength would be
+  # both wrong and laborious. Info keeps them visible and fixable without blocking.
+  owasp:api4:2023-string-limit: info
+  owasp:api4:2023-string-restricted: info
+  owasp:api4:2023-array-limit: info
+  owasp:api4:2023-integer-format: info
+  owasp:api4:2023-integer-limit: info
+  owasp:api4:2023-integer-limit-legacy: info
+
+  # An unreferenced schema can still back a generated DTO that the service uses: these
+  # repositories generate their models from the spec, so unreferenced is not unused.
+  oas3-unused-component: info
+
+  # Internal APIs behind APIM, never called from a browser: CORS is handled by APIM.
+  owasp:api8:2023-define-cors-origin: off

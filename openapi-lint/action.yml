@@ -1,0 +1,48 @@
+name: OpenAPI lint
+description: "Lint an OpenAPI spec with Spectral and fail the job on findings at or above a severity"
+
+inputs:
+  spec_path:
+    required: true
+    description: Path to the OpenAPI spec to lint, relative to the repository root
+  ruleset:
+    required: false
+    default: ''
+    description: >
+      Path to a Spectral ruleset in the calling repository. Empty means the ruleset
+      bundled with this action.
+  fail_severity:
+    required: false
+    default: "warn"
+    description: >
+      Lowest severity that fails the job: error, warn or info. Findings below it are
+      reported but never block. Downgrade a noisy rule by name in the ruleset, not here.
+  fail_on_violation:
+    required: false
+    default: "true"
+    description: >
+      Fail the job on blocking findings. Set to false for report-only. A lint that cannot
+      run fails regardless: that is a configuration error, not a finding.
+  spectral_version:
+    required: false
+    default: "6.16.3"
+    description: Version of @stoplight/spectral-cli to install
+  owasp_ruleset_version:
+    required: false
+    default: "2.0.1"
+    description: Version of @stoplight/spectral-owasp-ruleset to install
+
+runs:
+  using: "composite"
+  steps:
+    - name: Lint ${{ inputs.spec_path }}
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        SPEC_PATH: ${{ inputs.spec_path }}
+        RULESET: ${{ inputs.ruleset }}
+        FAIL_SEVERITY: ${{ inputs.fail_severity }}
+        FAIL_ON_VIOLATION: ${{ inputs.fail_on_violation }}
+        SPECTRAL_VERSION: ${{ inputs.spectral_version }}
+        OWASP_RULESET_VERSION: ${{ inputs.owasp_ruleset_version }}
+      run: bash "${ACTION_PATH}/openapi-lint.sh"
