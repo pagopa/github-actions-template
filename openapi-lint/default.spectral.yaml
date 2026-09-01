@@ -1,4 +1,4 @@
-# Shared OpenAPI ruleset for the eCommerce, Wallet and Checkout domains.
+# Shared OpenAPI ruleset for that can be used with every repo/domain.
 # A repository that needs different rules commits its own and passes it as `ruleset`.
 # Severity is the gate: a rule that should not block a pull request is downgraded here by
 # name and with its reason, rather than absorbed by a numeric threshold. Errors and

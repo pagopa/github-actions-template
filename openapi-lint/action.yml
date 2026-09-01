@@ -35,8 +35,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # One step on purpose: the script installs Spectral where it reads it from, so no
-    # input-derived path crosses a step boundary through GITHUB_ENV.
     - name: Lint ${{ inputs.spec_path }}
       shell: bash
       env:
