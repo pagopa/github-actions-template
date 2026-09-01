@@ -40,7 +40,6 @@ runs:
     - name: Lint ${{ inputs.spec_path }}
       shell: bash
       env:
-        # Values reach the script as env vars, never interpolated into the run block.
         ACTION_PATH: ${{ github.action_path }}
         SPEC_PATH: ${{ inputs.spec_path }}
         RULESET: ${{ inputs.ruleset }}
