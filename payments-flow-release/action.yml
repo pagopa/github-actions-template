@@ -48,7 +48,7 @@ runs:
 
     - name: 🚀 Release
       id: release
-      uses: pagopa/eng-github-actions-iac-template/global/release-action@main
+      uses: pagopa/eng-github-actions-iac-template/global/release-action@c4eb4d7f3b953bdb7e07f7f7ac47a125b0cf0ac7 # main
       with:
         github_token: ${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
         tag_format: ${{ steps.set-tag-format.outputs.TAG_FORMAT }}

@@ -85,7 +85,7 @@ runs:
 
     - name: Bump Package Version
       id: bump
-      uses: pagopa/github-actions-template/bump-semver@main
+      uses: pagopa/github-actions-template/bump-semver@bfb849a1e43acbc9347afae2428a799e0d2efe88 # main
       with:
         semver: ${{ inputs.semver  }}
         current_version: ${{ env.version }}
@@ -99,7 +99,7 @@ runs:
 
     - name: Helm Bump
       if: ${{ inputs.semver != 'skip' }}
-      uses: pagopa/github-actions-template/helm-bump@main
+      uses: pagopa/github-actions-template/helm-bump@bfb849a1e43acbc9347afae2428a799e0d2efe88 # main
       with:
         version: ${{ steps.semver.outputs.new_version }}
         beta: ${{ inputs.beta }}
