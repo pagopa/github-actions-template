@@ -49,7 +49,7 @@ runs:
 
     - name: Bump Chart Version
       id: bump_chart_version
-      uses: pagopa/github-actions-template/bump-semver@main
+      uses: pagopa/github-actions-template/bump-semver@bfb849a1e43acbc9347afae2428a799e0d2efe88 # main
       with:
         semver: ${{ (inputs.beta == 'true' && 'patch') || 'minor' }}
         current_version: ${{ env.chart_version }}
