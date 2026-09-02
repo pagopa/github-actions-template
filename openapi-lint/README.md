@@ -12,7 +12,7 @@ The action ships a default ruleset, `default.spectral.yaml`, calibrated for the 
 - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
 - name: OpenAPI lint - ${{ matrix.spec.version }}
-  uses: pagopa/github-actions-template/openapi-lint@<commit-sha> # pin the SHA; @v1 (rolling major tag) also works
+  uses: pagopa/github-actions-template/openapi-lint@<commit-sha> # pin the SHA
   with:
     spec_path: ${{ matrix.spec.path }}
 ```
@@ -21,14 +21,14 @@ With a ruleset owned by the calling repository, and in report-only mode:
 
 ```yaml
 - name: OpenAPI lint - ${{ matrix.spec.version }}
-  uses: pagopa/github-actions-template/openapi-lint@<commit-sha> # pin the SHA; @v1 (rolling major tag) also works
+  uses: pagopa/github-actions-template/openapi-lint@<commit-sha> # pin the SHA
   with:
     spec_path: ${{ matrix.spec.path }}
     ruleset: .spectral.yaml
     fail_on_violation: false
 ```
 
-The spec matrix stays in the calling workflow, because the number of specs differs per repository. Pin the action by commit SHA, the way the consuming repositories pin every action; `@v1`, the repository's rolling major tag, works too.
+The spec matrix stays in the calling workflow, because the number of specs differs per repository. Pin the action by full commit SHA, the way the consuming repositories pin every action.
 
 ## Input
 
