@@ -9,7 +9,7 @@ inputs:
     description: Personal GitHub token for packages
     required: false
     default: ''
-  docker_build: 
+  docker_build:
     description: Docker build
     required: false
     default: "true"
@@ -19,6 +19,10 @@ inputs:
     default: |
       maintainer=https://pagopa.it
       org.opencontainers.image.source=https://github.com/${{ github.repository }}
+  produce_release_notes:
+    description: Whether to produce release notes
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
@@ -53,6 +57,24 @@ runs:
         github_token: ${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
         tag_format: ${{ steps.set-tag-format.outputs.TAG_FORMAT }}
         branches: ${{ github.ref_name }}
+
+    - name: 🔨 Deleting release notes
+      if: steps.release.outputs.new_release_published == 'true' && inputs.produce_release_notes == 'false'
+      uses: actions/github-script@v9.0.0
+      env:
+        NEW_RELEASE_GIT_TAG: ${{ steps.release.outputs.new_release_git_tag }}
+      with:
+        script: |
+          const rel = await github.rest.repos.getReleaseByTag({ 
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag: process.env.NEW_RELEASE_GIT_TAG
+          })
+          await github.rest.repos.deleteRelease({ 
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: rel.data.id
+          })
 
     #
     # Docker
