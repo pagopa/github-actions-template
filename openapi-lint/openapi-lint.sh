@@ -21,7 +21,8 @@ esac
 
 # Empty ruleset means the one bundled next to this script.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RULESET="${RULESET:-${SCRIPT_DIR}/default.spectral.yaml}"
+BUNDLED_RULESET="${SCRIPT_DIR}/default.spectral.yaml"
+RULESET="${RULESET:-$BUNDLED_RULESET}"
 
 if [ ! -f "$SPEC_PATH" ]; then
   echo "::error::OpenAPI spec not found: ${SPEC_PATH}"
@@ -35,6 +36,15 @@ fi
 # Spectral resolves a ruleset's npm packages from the ruleset's own directory, so install
 # there. Never skip on an existing node_modules: that would lint with an unpinned version.
 PREFIX="$(dirname "$RULESET")"
+
+# Let a repo ruleset extend the shared one via `extends: ./default.spectral.yaml`: Spectral
+# looks for that path next to the repo ruleset, so drop a copy there. Skip it when the repo
+# uses the bundled ruleset directly, and never overwrite the repo ruleset itself.
+BUNDLED_COPY="${PREFIX}/default.spectral.yaml"
+if [ "$RULESET" != "$BUNDLED_RULESET" ] && [ "$RULESET" != "$BUNDLED_COPY" ]; then
+  cp "$BUNDLED_RULESET" "$BUNDLED_COPY"
+fi
+
 SPECTRAL_BIN="${PREFIX}/node_modules/.bin/spectral"
 npm install --no-save --no-package-lock --prefix "$PREFIX" \
   "@stoplight/spectral-cli@${SPECTRAL_VERSION}" \
