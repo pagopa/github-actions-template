@@ -28,6 +28,20 @@ With a ruleset owned by the calling repository, and in report-only mode:
     fail_on_violation: false
 ```
 
+A repository that only needs a few exceptions on top of the shared ruleset extends it rather than copying it. The action places a copy of `default.spectral.yaml` next to the ruleset it is given, so `extends: ./default.spectral.yaml` resolves:
+
+```yaml
+# .spectral.yaml in the calling repository
+extends: ./default.spectral.yaml
+overrides:
+  - files:
+      - "**/my-api.yaml#/paths/~1public-endpoint"
+    rules:
+      owasp:api2:2023-read-restricted: off # public by design, scoped to this path
+```
+
+Scope an exception to the path that needs it with `overrides`, never by turning a rule off for the whole ruleset: a repository-wide `off` would also silence a future endpoint that genuinely needs the rule.
+
 The spec matrix stays in the calling workflow, because the number of specs differs per repository. Pin the action by full commit SHA, the way the consuming repositories pin every action.
 
 ## Input
