@@ -68,7 +68,7 @@ runs:
 
     - name: Update Semantic Version
       id: semver
-      uses: pagopa/github-actions-template/maven-semver@main
+      uses: pagopa/github-actions-template/maven-semver@705d571bb13b279776fd20e9eb20232dc25679e4 # main
       with:
         semver: ${{inputs.semver}}
         beta: ${{inputs.beta}}
