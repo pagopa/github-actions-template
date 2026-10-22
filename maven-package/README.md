@@ -21,10 +21,12 @@ The action:
 
 ## Input
 
-| Param        | Description    | Required | Values   | Default |
-|--------------|----------------|----------|----------|---------|
-| github_token | A GitHub token | **true** | `string` |         |
-| branch       | Git branch     | **true** | `string` |         |
+| Param         | Description            | Required | Values   | Default |
+|---------------|------------------------|----------|----------|---------|
+| github_token  | A GitHub token         | **true** | `string` |         |
+| branch        | Git branch             | **true** | `string` |         |
+| jdk_version   | Select the JDK version | false    | `string` | `11`    |
+| maven_version | Maven version to use   | false    | `string` | `3.8.2` |
 
 ## Output
 

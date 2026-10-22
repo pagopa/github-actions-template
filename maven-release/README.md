@@ -32,15 +32,16 @@ The new version is saved in the output.
 
 ## Input
 
-| Param        | Description                                               | Required | Values                                           | Default |
-|--------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
-| semver       | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
-| github_token | A GitHub token                                            | **true** | `string`                                         |         |
-| beta         | True if it is a beta version (update canary helm version) | false    | `boolean`                                        | false   |
-| skip_ci      | True if you want skip CI workflows on commit release      | false    | `boolean`                                        | true    |  
-| jdk_version  | Select the JDK version                                    | false    | `11`, `17`                                       | `11`    |
-| prerelease   | True if it is a prerelease                                | false    | `boolean`                                        | false   |
-| only_tag     | True to create only the Tag without the Release           | false    | `boolean`                                        | false   |
+| Param         | Description                                               | Required | Values                                           | Default |
+|---------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
+| semver        | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| github_token  | A GitHub token                                            | **true** | `string`                                         |         |
+| beta          | True if it is a beta version (update canary helm version) | false    | `boolean`                                        | false   |
+| skip_ci       | True if you want skip CI workflows on commit release      | false    | `boolean`                                        | true    |  
+| jdk_version   | Select the JDK version                                    | false    | `string`                                         | `11`    |
+| prerelease    | True if it is a prerelease                                | false    | `boolean`                                        | false   |
+| only_tag      | True to create only the Tag without the Release           | false    | `boolean`                                        | false   |
+| maven_version | Maven version to use                                      | false    | `string`                                         | `3.8.2` |
 
 ## Output
 

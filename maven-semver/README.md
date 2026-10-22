@@ -30,11 +30,12 @@ The new version is saved in the output.
 
 ## Input
 
-| Param       | Description                                               | Required | Values                                           | Default |
-|-------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
-| semver      | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
-| beta        | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
-| jdk_version | Select the JDK version                                    | false    | `11`, `17`                                       | `11`    |
+| Param         | Description                                               | Required | Values                                           | Default |
+|---------------|-----------------------------------------------------------|----------|--------------------------------------------------|---------|
+| semver        | Select the new Semantic Version                           | **true** | `major`, `minor`, `patch`, `buildNumber`, `skip` |         |
+| beta          | True if it is a beta version (update canary helm version) | **true** | `boolean`                                        | false   |
+| jdk_version   | Select the JDK version                                    | false    | `string`                                         | `11`    |
+| maven_version | Maven version to use                                      | false    | `string`                                         | `3.8.2` |
 
 ## Output
 
