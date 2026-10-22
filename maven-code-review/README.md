@@ -34,8 +34,8 @@ pom.xml to calculate the coverage.
 | coverage_exclusions | Files to exclude from coverage         | false    | `string` | "**/config/*,**/*Mock*,**/model/**,**/entity/*" |
 | cpd_exclusions      | Files to exclude from code duplication | false    | `string` | **/model/**,**/entity/*"                        |
 | java_distribution   | Distribution of JDK                    | false    | `string` | zulu                                            |
-| java_version        | Version of JDK                         | false    | `string` | 11                                              |
-
+| java_version        | Select the JDK version                 | false    | `string` | `11`                                            |
+| maven_version       | Maven version to use                   | false    | `string` | `3.8.2`                                         |
 
 ## Output
 

@@ -12,12 +12,14 @@ inputs:
     description: Repository branch
   jdk_version:
     required: false
-    type: choice
+    type: string
     description: Select the JDK version
-    default: 11
-    options:
-      - 11
-      - 17
+    default: '11'
+  maven_version:
+    required: false
+    type: string
+    description: Maven version to use
+    default: '3.8.2'
 
 
 runs:
@@ -35,7 +37,7 @@ runs:
     - name: Set up Maven
       uses: stCarolas/setup-maven@07fbbe97d97ef44336b7382563d66743297e442f # v4.5
       with:
-        maven-version: 3.8.2
+        maven-version: ${{ inputs.maven_version}}
 
     - name: Cache Maven packages
       uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
