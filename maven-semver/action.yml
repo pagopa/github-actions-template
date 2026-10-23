@@ -101,7 +101,7 @@ runs:
 
     - name: Helm Bump
       if: ${{ inputs.semver != 'skip' }}
-      uses: pagopa/github-actions-template/helm-bump@main
+      uses: pagopa/github-actions-template/helm-bump@1aa27ebf80b99501a9019d63ef27f3057d2a4b1d # main
       with:
         version: ${{ steps.get_app_version.outputs.version }}
         beta: ${{ inputs.beta }}
