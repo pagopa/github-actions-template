@@ -15,6 +15,10 @@ inputs:
     default: |
       maintainer=https://pagopa.it
       org.opencontainers.image.source=https://github.com/${{ github.repository }}
+  extra_build_args:
+    description: Additional Docker build args (one per line, e.g. FOO=bar)
+    required: false
+    default: ''
 
 
 runs:
@@ -59,5 +63,7 @@ runs:
           tags: ${{ steps.set_docker_tags.outputs.DOCKER_TAGS }}
           labels: ${{ inputs.docker_labels }}
           platforms: linux/amd64
-          build-args: GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
+          build-args: |
+            GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
+            ${{ inputs.extra_build_args }}
           secrets: GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}

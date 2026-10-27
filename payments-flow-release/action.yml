@@ -23,6 +23,10 @@ inputs:
     description: Whether to produce release notes
     required: false
     default: "true"
+  extra_build_args:
+    description: Additional Docker build args (one per line, e.g. FOO=bar)
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -116,5 +120,6 @@ runs:
         labels: ${{ inputs.docker_labels }}
         build-args: |
           GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
+          ${{ inputs.extra_build_args }}
         secrets: |
           GIT_AUTH_TOKEN=${{ steps.set_token.outputs.GIT_AUTH_TOKEN }}
