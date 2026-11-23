@@ -106,8 +106,8 @@ runs:
     - name: 🛃 Log in to the Github Container registry
       id: docker_login
       if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
-      # https://github.com/docker/login-action/releases/tag/v3.6.0
-      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+      # https://github.com/docker/login-action/releases/tag/v4.8.0
+      uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -116,7 +116,7 @@ runs:
     - name: 📦 Build and push Docker image with release version
       id: docker_build_push
       if: steps.release.outputs.new_release_published == 'true' && inputs.docker_build == 'true'
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
         push: true
