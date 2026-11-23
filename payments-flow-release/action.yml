@@ -45,8 +45,6 @@ runs:
           echo "TAG_FORMAT=uat-v\${version}" >> $GITHUB_OUTPUT
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           echo "TAG_FORMAT=v\${version}" >> $GITHUB_OUTPUT
-        else
-          echo "TAG_FORMAT=develop-v\${version}" >> $GITHUB_OUTPUT
         fi
 
     # Set the appropriate token
@@ -103,8 +101,6 @@ runs:
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           # vx.y.z, latest
           echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:v${{ steps.release.outputs.new_release_version }},ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
-        else
-            echo "DOCKER_TAGS=ghcr.io/${{ github.repository }}:snapshot" >> $GITHUB_OUTPUT
         fi
 
     - name: 🛃 Log in to the Github Container registry
