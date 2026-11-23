@@ -45,6 +45,8 @@ runs:
           echo "TAG_FORMAT=uat-v\${version}" >> $GITHUB_OUTPUT
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           echo "TAG_FORMAT=v\${version}" >> $GITHUB_OUTPUT
+        else
+          echo "TAG_FORMAT=develop-v\${version}" >> $GITHUB_OUTPUT
         fi
 
     # Set the appropriate token
